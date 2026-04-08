@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { editTags } from './commands/edit-tags';
 import {
   jjDescribe,
   jjFetch,
@@ -9,6 +10,7 @@ import {
 import { listNotes } from './commands/list-notes';
 import { listTags } from './commands/list-tags';
 import { newNote } from './commands/new-note';
+import { renameItem } from './commands/rename-item';
 import { maybeInitJj, selectNotesFolder, setupNotes } from './commands/setup';
 import { getAutoCommitInterval, getNotePath, getUseJujutsu } from './config';
 import { NotesTreeProvider } from './notes-tree-provider';
@@ -83,6 +85,17 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('notes.jjNew', jjNew),
     vscode.commands.registerCommand('notes.jjPush', jjPush),
     vscode.commands.registerCommand('notes.jjFetch', jjFetch),
+
+    vscode.commands.registerCommand(
+      'notes.editTags',
+      (item: { data: { filePath?: string } }) =>
+        editTags(item?.data?.filePath ?? ''),
+    ),
+    vscode.commands.registerCommand(
+      'notes.renameItem',
+      (item: { data: { filePath?: string } }) =>
+        renameItem(item?.data?.filePath ?? ''),
+    ),
   );
 
   // Auto-commit timer

@@ -39,16 +39,60 @@ function extractTags(yamlBlock: string): string[] {
   // Block list style:
   //   tags:
   //     - foo
-  const blockMatch = yamlBlock.match(/^tags\s*:([\s\S]*?)(?=^\S|Z)/m);
-  if (blockMatch) {
-    const lines = blockMatch[1].split('\n');
-    const tags: string[] = [];
-    for (const line of lines) {
-      const item = line.match(/^\s+-\s+['"]?(.+?)['"]?\s*$/);
-      if (item) tags.push(item[1].trim());
-    }
-    return tags;
+  // Walk line-by-line to avoid regex end-of-string issues.
+  const lines = yamlBlock.split('\n');
+  const tagsLineIdx = lines.findIndex((l) => /^tags\s*:/.test(l));
+  if (tagsLineIdx === -1) return [];
+
+  const tags: string[] = [];
+  for (let i = tagsLineIdx + 1; i < lines.length; i++) {
+    const trimmed = lines[i].trimEnd();
+    // Stop if we hit a non-indented, non-empty line (another YAML key)
+    if (trimmed.length > 0 && !/^\s/.test(trimmed)) break;
+    const item = trimmed.match(/^\s+-\s+['"]?(.+?)['"]?\s*$/);
+    if (item) tags.push(item[1].trim());
+  }
+  return tags;
+}
+
+/**
+ * Writes (or replaces) the `tags` field in a file's YAML front matter.
+ *
+ * - If the file has no front matter, prepends one.
+ * - If a `tags:` key exists, replaces it in place.
+ * - Other front matter fields are preserved unchanged.
+ * - Uses block-list style:
+ *     tags:
+ *       - foo
+ *       - bar
+ */
+export function writeTags(filePath: string, tags: string[]): void {
+  const fs = require('node:fs') as typeof import('node:fs');
+  let text: string;
+  try {
+    text = fs.readFileSync(filePath, 'utf8');
+  } catch {
+    return;
   }
 
-  return [];
+  const tagBlock =
+    tags.length === 0
+      ? 'tags: []'
+      : `tags:\n${tags.map((t) => `  - ${t}`).join('\n')}`;
+
+  const fmStart = text.startsWith('---');
+  const fmEnd = fmStart ? text.indexOf('\n---', 3) : -1;
+
+  if (fmStart && fmEnd !== -1) {
+    const block = text.slice(3, fmEnd).trim();
+    const tagsRe = /^tags\s*:.*(?:\n(?:[ \t]+.*)*)*/m;
+    const newBlock = tagsRe.test(block)
+      ? block.replace(tagsRe, tagBlock)
+      : `${block}\n${tagBlock}`;
+    const rest = text.slice(fmEnd + 4); // skip closing \n---
+    fs.writeFileSync(filePath, `---\n${newBlock}\n---${rest}`, 'utf8');
+  } else {
+    // No front matter — prepend
+    fs.writeFileSync(filePath, `---\n${tagBlock}\n---\n\n${text}`, 'utf8');
+  }
 }

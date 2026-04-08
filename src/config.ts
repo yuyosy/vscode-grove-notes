@@ -42,6 +42,16 @@ export function getCounterStartsAtOne(): boolean {
   return getConfig().get<boolean>('counterStartsAtOne', false);
 }
 
+/** Predefined tag list available for quick selection when editing note tags. */
+export function getPredefinedTags(): string[] {
+  return getConfig().get<string[]>('tags.predefined', []);
+}
+
+/** When true, Edit Tags also scans all notes in the workspace for tag candidates. */
+export function getScanWorkspaceTags(): boolean {
+  return getConfig().get<boolean>('tags.scanWorkspace', false);
+}
+
 /** When false, all Jujutsu/jj features are disabled. */
 export function getUseJujutsu(): boolean {
   return getConfig().get<boolean>('versionControl.useJujutsu', true);

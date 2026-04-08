@@ -59,6 +59,16 @@
       {
         "command": "notes.selectNotesFolder",
         "title": "Notes: Select Notes Folder"
+      },
+      {
+        "command": "notes.editTags",
+        "title": "Notes: Edit Tags",
+        "icon": "$(tag)"
+      },
+      {
+        "command": "notes.renameItem",
+        "title": "Notes: Rename",
+        "icon": "$(edit)"
       }
     ],
     "viewsContainers": {
@@ -108,6 +118,18 @@
           "when": "view == notesView",
           "group": "navigation@4"
         }
+      ],
+      "view/item/context": [
+        {
+          "command": "notes.editTags",
+          "when": "view == notesView && viewItem == noteFile",
+          "group": "notes_1_tags@1"
+        },
+        {
+          "command": "notes.renameItem",
+          "when": "view == notesView && (viewItem == noteFile || viewItem == noteDir)",
+          "group": "notes_2_file@1"
+        }
       ]
     },
     "configuration": {
@@ -149,6 +171,19 @@
           "type": "boolean",
           "default": false,
           "description": "When true, duplicate file counters start at 1 (e.g. {{N}}→_1, _2… or name_1, _2…). When false (default), the first file has no counter and conflicts begin at _2."
+        },
+        "notes.tags.predefined": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Predefined tag list shown in the Edit Tags quick picker. Tags not in this list can still be typed manually."
+        },
+        "notes.tags.scanWorkspace": {
+          "type": "boolean",
+          "default": false,
+          "description": "When enabled, Edit Tags also scans all notes in the workspace and adds any discovered tags to the picker candidates. Disable for large note collections to avoid performance impact."
         },
         "notes.versionControl.autoCommitInterval": {
           "type": "number",
