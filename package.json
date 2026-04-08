@@ -62,7 +62,7 @@
         {
           "id": "notes-explorer",
           "title": "Notes",
-          "icon": "media/icon/notes.svg"
+          "icon": "resources/icon/notes.svg"
         }
       ]
     },
@@ -144,6 +144,11 @@
           "type": "string",
           "default": "auto: {{YYYY-MM-DD HH:mm}}",
           "description": "Commit message for auto-commits. Supports date tokens."
+        },
+        "notes.counterStartsAtOne": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, duplicate file counters start at 1 (e.g. {{N}}→_1, _2… or name_1, _2…). When false (default), the first file has no counter and conflicts begin at _2."
         }
       }
     }

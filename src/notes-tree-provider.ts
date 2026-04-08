@@ -1,5 +1,5 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import * as vscode from 'vscode';
 import { getIgnorePatterns, getNotePath } from './config';
 import type { NoteTreeItem, TagIndex } from './types';
@@ -40,8 +40,8 @@ export class NotesTreeItem extends vscode.TreeItem {
 export class NotesTreeProvider
   implements vscode.TreeDataProvider<NotesTreeItem>
 {
-  // biome-ignore lint/suspicious/noConfusingVoidType: required by vscode.TreeDataProvider
   private _onDidChangeTreeData = new vscode.EventEmitter<
+    // biome-ignore lint/suspicious/noConfusingVoidType: required by vscode.TreeDataProvider
     NotesTreeItem | undefined | null | void
   >();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;

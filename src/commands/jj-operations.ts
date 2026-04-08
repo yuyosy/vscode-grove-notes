@@ -1,5 +1,5 @@
-import { execFile } from 'child_process';
-import { promisify } from 'util';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import * as vscode from 'vscode';
 import { getAutoCommitMessage, getNotePath } from '../config';
 import { formatDateTokens } from '../utils/date-format';

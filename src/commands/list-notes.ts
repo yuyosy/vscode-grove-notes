@@ -1,4 +1,4 @@
-import * as path from 'path';
+import * as path from 'node:path';
 import * as vscode from 'vscode';
 import { getIgnorePatterns, getNotePath } from '../config';
 import { getMtime, walkDir } from '../utils/file-utils';

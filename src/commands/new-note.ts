@@ -1,17 +1,18 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import * as vscode from 'vscode';
 import {
+  getCounterStartsAtOne,
   getDefaultExtension,
   getDefaultNoteTitle,
   getNotePath,
   getTemplatePath,
 } from '../config';
-import { ensureFile } from '../utils/file-utils';
 import {
-  buildFileName,
+  buildBaseFileName,
   loadTemplates,
   processTemplate,
+  resolveUniqueFilePath,
 } from '../utils/template';
 
 export async function newNote(): Promise<void> {
@@ -34,6 +35,9 @@ export async function newNote(): Promise<void> {
   const templates = loadTemplates(templateDir);
 
   let templateFilePath: string | undefined;
+  // When a template is selected, its filename (without .md) becomes the
+  // format string for the new note's file name.
+  let templateNamePattern: string | undefined;
 
   if (templates.length > 0) {
     const items: vscode.QuickPickItem[] = [
@@ -49,46 +53,52 @@ export async function newNote(): Promise<void> {
       selection.description !== 'Create an empty note'
     ) {
       templateFilePath = selection.description;
+      const tpl = templates.find((t) => t.filePath === selection.description);
+      if (tpl) templateNamePattern = tpl.name;
     }
   }
 
-  // 2. Input note title
+  // 2. Input note title — empty input is allowed and defaults to 'untitled'
   const titleInput = await vscode.window.showInputBox({
-    prompt: 'Note title',
+    prompt: 'Note title (leave empty for "untitled")',
     placeHolder: 'My note title',
-    validateInput: (v) => (v.trim() ? null : 'Title cannot be empty'),
   });
-  if (titleInput === undefined) return;
-  const title = titleInput.trim();
+  if (titleInput === undefined) return; // Escape pressed
+  const title = titleInput.trim() || 'untitled';
 
-  // 3. Build file name and path
-  const format = getDefaultNoteTitle();
+  // 3. Build base file name
+  //    Priority: template filename pattern > notes.defaultNoteTitle config
+  const format = templateNamePattern ?? getDefaultNoteTitle();
   const ext = getDefaultExtension();
-  const fileName = buildFileName(format, title, ext, now);
+  const baseName = buildBaseFileName(format, title, now);
 
-  // Support sub-folder via "/" in title
-  const subFolder = path.dirname(fileName);
-  const baseFileName = path.basename(fileName);
-  const targetDir =
-    subFolder === '.' ? notePath : path.join(notePath, subFolder);
-  const filePath = path.join(targetDir, baseFileName);
+  // Support sub-folder via "/" in baseName (e.g. title = "projects/my-note")
+  const subDir = path.dirname(baseName);
+  const cleanBase = path.basename(baseName);
+  const targetDir = subDir === '.' ? notePath : path.join(notePath, subDir);
 
-  // 4. Create file with template content
-  ensureFile(filePath);
+  // 4. Resolve unique path
+  //    - {{N}} / {{N:00}} in the pattern → replaced with counter
+  //    - No {{N}} but collision → appends _N
+  //    Counter start: 1 or 2 depending on notes.counterStartsAtOne setting
+  const filePath = resolveUniqueFilePath(
+    targetDir,
+    cleanBase,
+    ext,
+    getCounterStartsAtOne(),
+  );
 
+  // 5. Write file (template content or empty)
   const content = templateFilePath
     ? processTemplate(templateFilePath, title, now)
     : '';
+  fs.writeFileSync(filePath, content, 'utf8');
 
-  if (content) {
-    fs.writeFileSync(filePath, content, 'utf8');
-  }
-
-  // 5. Open the file
+  // 6. Open the file
   const doc = await vscode.workspace.openTextDocument(filePath);
   await vscode.window.showTextDocument(doc);
 
-  // Move cursor to end of file
+  // Move cursor to end
   const editor = vscode.window.activeTextEditor;
   if (editor) {
     const lastLine = doc.lineCount - 1;
@@ -96,6 +106,5 @@ export async function newNote(): Promise<void> {
     editor.selection = new vscode.Selection(pos, pos);
   }
 
-  // Refresh tree view
   vscode.commands.executeCommand('notes.refresh');
 }

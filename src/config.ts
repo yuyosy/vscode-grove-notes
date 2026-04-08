@@ -1,4 +1,4 @@
-import * as path from 'path';
+import * as path from 'node:path';
 import * as vscode from 'vscode';
 
 const SECTION = 'notes';
@@ -36,6 +36,11 @@ export function getIgnorePatterns(): string[] {
     '.DS_Store',
     'node_modules',
   ]);
+}
+
+/** When true, file counters start at 1 ({{N}}→_1, no-token→_1). Default false (start at 2). */
+export function getCounterStartsAtOne(): boolean {
+  return getConfig().get<boolean>('counterStartsAtOne', false);
 }
 
 export function getAutoCommitInterval(): number {
