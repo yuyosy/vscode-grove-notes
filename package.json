@@ -55,6 +55,10 @@
       {
         "command": "notes.jjFetch",
         "title": "Notes: Jujutsu - Git Fetch"
+      },
+      {
+        "command": "notes.selectNotesFolder",
+        "title": "Notes: Select Notes Folder"
       }
     ],
     "viewsContainers": {
@@ -70,10 +74,18 @@
       "notes-explorer": [
         {
           "id": "notesView",
-          "name": "Notes"
+          "name": "Notes",
+          "icon": "resources/icon/notes.svg"
         }
       ]
     },
+    "viewsWelcome": [
+      {
+        "view": "notesView",
+        "contents": "$(notebook) Notes\n\nNo notes folder configured yet.\nSelect a folder to start managing your Markdown notes.\n\n[$(folder-opened) Select Notes Folder](command:notes.selectNotesFolder)\n\nOr run `Notes: Setup Notes Folder` from the Command Palette (Ctrl+Shift+P).\n\nAlready have a path? $(settings-gear) [Open Settings](command:workbench.action.openSettings?%5B%22notes.notePath%22%5D) to set it directly.",
+        "when": "!notes.notesPathConfigured"
+      }
+    ],
     "menus": {
       "view/title": [
         {
@@ -113,7 +125,7 @@
         },
         "notes.defaultNoteTitle": {
           "type": "string",
-          "default": "{{YYYY-MM-DD}}_{{title}}",
+          "default": "{{title}}_{{YYYY-MM-DD}}",
           "description": "File name format for new notes. Supports {{YYYY}}, {{MM}}, {{DD}}, {{HH}}, {{mm}}, {{ss}}, {{title}}."
         },
         "notes.defaultExtension": {
@@ -129,28 +141,27 @@
           "default": [
             ".git",
             ".jj",
-            ".DS_Store",
-            "node_modules"
+            ".DS_Store"
           ],
           "description": "Folder/file name patterns to ignore in the notes view"
-        },
-        "notes.autoCommitInterval": {
-          "type": "number",
-          "default": 0,
-          "minimum": 0,
-          "description": "Auto-commit interval in minutes using Jujutsu. Set to 0 to disable."
-        },
-        "notes.autoCommitMessage": {
-          "type": "string",
-          "default": "auto: {{YYYY-MM-DD HH:mm}}",
-          "description": "Commit message for auto-commits. Supports date tokens."
         },
         "notes.counterStartsAtOne": {
           "type": "boolean",
           "default": false,
           "description": "When true, duplicate file counters start at 1 (e.g. {{N}}→_1, _2… or name_1, _2…). When false (default), the first file has no counter and conflicts begin at _2."
         },
-        "notes.useJujutsu": {
+        "notes.versionControl.autoCommitInterval": {
+          "type": "number",
+          "default": 0,
+          "minimum": 0,
+          "description": "Auto-commit interval in minutes using Jujutsu. Set to 0 to disable."
+        },
+        "notes.versionControl.autoCommitMessage": {
+          "type": "string",
+          "default": "auto: {{YYYY-MM-DD HH:mm}}",
+          "description": "Commit message for auto-commits. Supports date tokens."
+        },
+        "notes.versionControl.useJujutsu": {
           "type": "boolean",
           "default": true,
           "description": "Enable Jujutsu (jj) version control features. When false, all jj commands and toolbar buttons are hidden."

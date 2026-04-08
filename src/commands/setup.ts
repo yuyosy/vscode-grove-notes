@@ -12,6 +12,14 @@ export async function setupNotes(): Promise<void> {
   );
   if (choice !== 'Select Folder') return;
 
+  await selectNotesFolder();
+}
+
+/**
+ * Directly opens a folder picker and sets the notes path.
+ * Use this when the user has already expressed intent (e.g. Welcome button).
+ */
+export async function selectNotesFolder(): Promise<void> {
   const uris = await vscode.window.showOpenDialog({
     canSelectFiles: false,
     canSelectFolders: true,

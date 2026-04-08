@@ -21,7 +21,7 @@ export function getTemplatePath(): string {
 export function getDefaultNoteTitle(): string {
   return getConfig().get<string>(
     'defaultNoteTitle',
-    '{{YYYY-MM-DD}}_{{title}}',
+    '{{title}}_{{YYYY-MM-DD}}',
   );
 }
 
@@ -34,7 +34,6 @@ export function getIgnorePatterns(): string[] {
     '.git',
     '.jj',
     '.DS_Store',
-    'node_modules',
   ]);
 }
 
@@ -45,16 +44,16 @@ export function getCounterStartsAtOne(): boolean {
 
 /** When false, all Jujutsu/jj features are disabled. */
 export function getUseJujutsu(): boolean {
-  return getConfig().get<boolean>('useJujutsu', true);
+  return getConfig().get<boolean>('versionControl.useJujutsu', true);
 }
 
 export function getAutoCommitInterval(): number {
-  return getConfig().get<number>('autoCommitInterval', 0);
+  return getConfig().get<number>('versionControl.autoCommitInterval', 0);
 }
 
 export function getAutoCommitMessage(): string {
   return getConfig().get<string>(
-    'autoCommitMessage',
+    'versionControl.autoCommitMessage',
     'auto: {{YYYY-MM-DD HH:mm}}',
   );
 }

@@ -9,7 +9,7 @@ import {
 import { listNotes } from './commands/list-notes';
 import { listTags } from './commands/list-tags';
 import { newNote } from './commands/new-note';
-import { maybeInitJj, setupNotes } from './commands/setup';
+import { maybeInitJj, selectNotesFolder, setupNotes } from './commands/setup';
 import { getAutoCommitInterval, getNotePath, getUseJujutsu } from './config';
 import { NotesTreeProvider } from './notes-tree-provider';
 import { initJjPath, isJjAvailable, jjSource } from './utils/jj-resolver';
@@ -17,6 +17,15 @@ import { initJjPath, isJjAvailable, jjSource } from './utils/jj-resolver';
 /** Syncs the `notes.jjEnabled` context key used by `when` clauses in package.json. */
 function setJjContext(enabled: boolean): void {
   vscode.commands.executeCommand('setContext', 'notes.jjEnabled', enabled);
+}
+
+/** Syncs the `notes.notesPathConfigured` context key used by viewsWelcome. */
+function setNotePathContext(): void {
+  vscode.commands.executeCommand(
+    'setContext',
+    'notes.notesPathConfigured',
+    !!getNotePath(),
+  );
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -37,6 +46,7 @@ export function activate(context: vscode.ExtensionContext) {
   }
   const jjEnabled = useJj && isJjAvailable();
   setJjContext(jjEnabled);
+  setNotePathContext();
 
   // Check existing notes folder for jj repo on startup
   if (jjEnabled) {
@@ -53,6 +63,11 @@ export function activate(context: vscode.ExtensionContext) {
 
     vscode.commands.registerCommand('notes.setup', async () => {
       await setupNotes();
+      treeProvider.refresh();
+    }),
+
+    vscode.commands.registerCommand('notes.selectNotesFolder', async () => {
+      await selectNotesFolder();
       treeProvider.refresh();
     }),
 
@@ -81,7 +96,7 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (
-        e.affectsConfiguration('notes.useJujutsu') ||
+        e.affectsConfiguration('notes.versionControl.useJujutsu') ||
         e.affectsConfiguration('notes.notePath')
       ) {
         // Re-evaluate jj context key
@@ -96,7 +111,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
       }
       if (
-        e.affectsConfiguration('notes.autoCommitInterval') ||
+        e.affectsConfiguration('notes.versionControl.autoCommitInterval') ||
         e.affectsConfiguration('notes.notePath')
       ) {
         autoCommitDisposable?.dispose();
@@ -108,6 +123,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
       }
       if (e.affectsConfiguration('notes')) {
+        setNotePathContext();
         treeProvider.refresh();
       }
     }),

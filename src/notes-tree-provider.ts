@@ -56,6 +56,8 @@ export class NotesTreeProvider
 
   getChildren(element?: NotesTreeItem): vscode.ProviderResult<NotesTreeItem[]> {
     if (!element) {
+      // Return empty array when no folder is set — triggers the viewsWelcome content
+      if (!getNotePath()) return [];
       return this._getRoots();
     }
 
