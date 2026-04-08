@@ -9,11 +9,43 @@ import {
 import { listNotes } from './commands/list-notes';
 import { listTags } from './commands/list-tags';
 import { newNote } from './commands/new-note';
-import { setupNotes } from './commands/setup';
-import { getAutoCommitInterval } from './config';
+import { maybeInitJj, setupNotes } from './commands/setup';
+import { getAutoCommitInterval, getNotePath, getUseJujutsu } from './config';
 import { NotesTreeProvider } from './notes-tree-provider';
+import { initJjPath, isJjAvailable, jjSource } from './utils/jj-resolver';
+
+/** Syncs the `notes.jjEnabled` context key used by `when` clauses in package.json. */
+function setJjContext(enabled: boolean): void {
+  vscode.commands.executeCommand('setContext', 'notes.jjEnabled', enabled);
+}
 
 export function activate(context: vscode.ExtensionContext) {
+  // --- jj initialisation ---
+  const useJj = getUseJujutsu();
+  if (useJj) {
+    initJjPath(context.extensionPath);
+    if (!isJjAvailable()) {
+      vscode.window.showWarningMessage(
+        'Notes: jj binary not found. Jujutsu features will be unavailable. Install jj or place a bundled binary at resources/bin/<platform>/jj[.exe].',
+      );
+    } else {
+      const src = jjSource(context.extensionPath);
+      if (src === 'bundled') {
+        vscode.window.showInformationMessage('Notes: Using bundled jj binary.');
+      }
+    }
+  }
+  const jjEnabled = useJj && isJjAvailable();
+  setJjContext(jjEnabled);
+
+  // Check existing notes folder for jj repo on startup
+  if (jjEnabled) {
+    const notePath = getNotePath();
+    if (notePath) {
+      maybeInitJj(notePath);
+    }
+  }
+
   const treeProvider = new NotesTreeProvider();
 
   context.subscriptions.push(
@@ -48,6 +80,21 @@ export function activate(context: vscode.ExtensionContext) {
   let autoCommitDisposable: vscode.Disposable | undefined;
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
+      if (
+        e.affectsConfiguration('notes.useJujutsu') ||
+        e.affectsConfiguration('notes.notePath')
+      ) {
+        // Re-evaluate jj context key
+        const nowUseJj = getUseJujutsu();
+        const nowJjEnabled = nowUseJj && isJjAvailable();
+        setJjContext(nowJjEnabled);
+
+        // Check for jj init when notePath changes
+        if (nowJjEnabled && e.affectsConfiguration('notes.notePath')) {
+          const notePath = getNotePath();
+          if (notePath) maybeInitJj(notePath);
+        }
+      }
       if (
         e.affectsConfiguration('notes.autoCommitInterval') ||
         e.affectsConfiguration('notes.notePath')

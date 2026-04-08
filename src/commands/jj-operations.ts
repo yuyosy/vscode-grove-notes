@@ -3,6 +3,7 @@ import { promisify } from 'node:util';
 import * as vscode from 'vscode';
 import { getAutoCommitMessage, getNotePath } from '../config';
 import { formatDateTokens } from '../utils/date-format';
+import { getJjPath } from '../utils/jj-resolver';
 
 const execFileAsync = promisify(execFile);
 
@@ -10,8 +11,9 @@ async function runJj(
   args: string[],
   cwd: string,
 ): Promise<{ stdout: string; stderr: string }> {
+  const jjPath = getJjPath();
   try {
-    return await execFileAsync('jj', args, { cwd });
+    return await execFileAsync(jjPath, args, { cwd });
   } catch (err: unknown) {
     const e = err as { stdout?: string; stderr?: string; message?: string };
     throw new Error(e.stderr || e.message || String(err));
@@ -100,6 +102,28 @@ export async function jjFetch(): Promise<void> {
     vscode.window.showErrorMessage(
       `jj git fetch failed: ${(err as Error).message}`,
     );
+  }
+}
+
+/**
+ * Initialises a jj repository in the given folder.
+ * Runs `jj git init --colocate` so it works side-by-side with a .git repo,
+ * or plain `jj init` when no .git is present.
+ */
+export async function jjInit(folderPath: string): Promise<void> {
+  try {
+    // Prefer colocated init when a .git already exists
+    const fs = await import('node:fs');
+    const gitExists = fs.existsSync(
+      require('node:path').join(folderPath, '.git'),
+    );
+    const args = gitExists ? ['git', 'init', '--colocate'] : ['git', 'init'];
+    await runJj(args, folderPath);
+    vscode.window.showInformationMessage(
+      `jj git init: repository initialized in ${folderPath}`,
+    );
+  } catch (err: unknown) {
+    vscode.window.showErrorMessage(`jj init failed: ${(err as Error).message}`);
   }
 }
 

@@ -83,12 +83,12 @@
         },
         {
           "command": "notes.jjDescribe",
-          "when": "view == notesView",
+          "when": "view == notesView && notes.jjEnabled",
           "group": "navigation@2"
         },
         {
           "command": "notes.jjNew",
-          "when": "view == notesView",
+          "when": "view == notesView && notes.jjEnabled",
           "group": "navigation@3"
         },
         {
@@ -149,6 +149,11 @@
           "type": "boolean",
           "default": false,
           "description": "When true, duplicate file counters start at 1 (e.g. {{N}}→_1, _2… or name_1, _2…). When false (default), the first file has no counter and conflicts begin at _2."
+        },
+        "notes.useJujutsu": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Jujutsu (jj) version control features. When false, all jj commands and toolbar buttons are hidden."
         }
       }
     }

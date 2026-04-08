@@ -43,6 +43,11 @@ export function getCounterStartsAtOne(): boolean {
   return getConfig().get<boolean>('counterStartsAtOne', false);
 }
 
+/** When false, all Jujutsu/jj features are disabled. */
+export function getUseJujutsu(): boolean {
+  return getConfig().get<boolean>('useJujutsu', true);
+}
+
 export function getAutoCommitInterval(): number {
   return getConfig().get<number>('autoCommitInterval', 0);
 }
