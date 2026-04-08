@@ -1,19 +1,157 @@
 {
   "name": "notes",
-  "displayName": "notes",
+  "displayName": "Notes",
+  "description": "Personal note-taking extension with templates, tags, and Jujutsu VCS integration",
   "version": "0.1.0",
   "publisher": "yuyosy",
   "engines": {
     "vscode": "^1.86.0"
   },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "extension.helloWorld",
-        "title": "Hello World"
+        "command": "notes.setup",
+        "title": "Notes: Setup Notes Folder"
+      },
+      {
+        "command": "notes.newNote",
+        "title": "Notes: New Note",
+        "icon": "$(add)"
+      },
+      {
+        "command": "notes.listNotes",
+        "title": "Notes: List Recent Notes"
+      },
+      {
+        "command": "notes.listTags",
+        "title": "Notes: Browse by Tag"
+      },
+      {
+        "command": "notes.refresh",
+        "title": "Notes: Refresh View",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "notes.jjDescribe",
+        "title": "Notes: Jujutsu - Describe (Commit Message)",
+        "icon": "$(git-commit)"
+      },
+      {
+        "command": "notes.jjNew",
+        "title": "Notes: Jujutsu - New Changeset",
+        "icon": "$(git-branch)"
+      },
+      {
+        "command": "notes.jjPush",
+        "title": "Notes: Jujutsu - Git Push"
+      },
+      {
+        "command": "notes.jjFetch",
+        "title": "Notes: Jujutsu - Git Fetch"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "notes-explorer",
+          "title": "Notes",
+          "icon": "media/icon/notes.svg"
+        }
+      ]
+    },
+    "views": {
+      "notes-explorer": [
+        {
+          "id": "notesView",
+          "name": "Notes"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "notes.newNote",
+          "when": "view == notesView",
+          "group": "navigation@1"
+        },
+        {
+          "command": "notes.jjDescribe",
+          "when": "view == notesView",
+          "group": "navigation@2"
+        },
+        {
+          "command": "notes.jjNew",
+          "when": "view == notesView",
+          "group": "navigation@3"
+        },
+        {
+          "command": "notes.refresh",
+          "when": "view == notesView",
+          "group": "navigation@4"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Notes",
+      "properties": {
+        "notes.notePath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the notes folder"
+        },
+        "notes.templatePath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the templates folder. Defaults to <notePath>/.templates if empty."
+        },
+        "notes.defaultNoteTitle": {
+          "type": "string",
+          "default": "{{YYYY-MM-DD}}_{{title}}",
+          "description": "File name format for new notes. Supports {{YYYY}}, {{MM}}, {{DD}}, {{HH}}, {{mm}}, {{ss}}, {{title}}."
+        },
+        "notes.defaultExtension": {
+          "type": "string",
+          "default": "md",
+          "description": "Default file extension for new notes"
+        },
+        "notes.ignorePatterns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            ".git",
+            ".jj",
+            ".DS_Store",
+            "node_modules"
+          ],
+          "description": "Folder/file name patterns to ignore in the notes view"
+        },
+        "notes.autoCommitInterval": {
+          "type": "number",
+          "default": 0,
+          "minimum": 0,
+          "description": "Auto-commit interval in minutes using Jujutsu. Set to 0 to disable."
+        },
+        "notes.autoCommitMessage": {
+          "type": "string",
+          "default": "auto: {{YYYY-MM-DD HH:mm}}",
+          "description": "Commit message for auto-commits. Supports date tokens."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "biome check src"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.10",
