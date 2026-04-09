@@ -1,0 +1,34 @@
+{
+  "extension.displayName": "Notes",
+  "extension.description": "Personal note-taking extension with templates, tags, and Jujutsu VCS integration",
+
+  "command.setup.title": "Setup Notes Folder",
+  "command.newNote.title": "New Note",
+  "command.listNotes.title": "List Recent Notes",
+  "command.listTags.title": "Browse by Tag",
+  "command.refresh.title": "Refresh View",
+  "command.jjDescribe.title": "Jujutsu - Describe (Commit Message)",
+  "command.jjNew.title": "Jujutsu - New Changeset",
+  "command.jjPush.title": "Jujutsu - Git Push",
+  "command.jjFetch.title": "Jujutsu - Git Fetch",
+  "command.selectNotesFolder.title": "Select Notes Folder",
+  "command.editTags.title": "Edit Tags",
+  "command.renameItem.title": "Rename",
+
+  "viewsContainer.notes.title": "Notes",
+  "view.notes.name": "Notes",
+  "viewsWelcome.notesView.contents": "$(notebook) Notes\n\nNo notes folder configured yet.\nSelect a folder to start managing your Markdown notes.\n\n[$(folder-opened) Select Notes Folder](command:notes.selectNotesFolder)\n\nOr run `Notes: Setup Notes Folder` from the Command Palette (Ctrl+Shift+P).\n\nAlready have a path? $(settings-gear) [Open Settings](command:workbench.action.openSettings?%5B%22notes.notePath%22%5D) to set it directly.\n\nOther settings include templates path, default note title format, ignore patterns, tags, and Jujutsu version control options. Explore the settings to customize your note-taking experience!\n\n$(settings-gear) [Open Extension Settings](command:workbench.action.openSettings?%5B%22notes%22%5D)",
+
+  "config.title": "Notes",
+  "config.notePath.description": "Path to the notes folder",
+  "config.templatePath.description": "Path to the templates folder. Defaults to <notePath>/.templates if empty.",
+  "config.defaultNoteTitle.description": "File name format for new notes. Supports {{YYYY}}, {{MM}}, {{DD}}, {{HH}}, {{mm}}, {{ss}}, {{title}}.",
+  "config.defaultExtension.description": "Default file extension for new notes",
+  "config.ignorePatterns.description": "Folder/file name patterns to ignore in the notes view",
+  "config.counterStartsAtOne.description": "When true, duplicate file counters start at 1 (e.g. {{N}}\u2192_1, _2\u2026 or name_1, _2\u2026). When false (default), the first file has no counter and conflicts begin at _2.",
+  "config.tags.predefined.description": "Predefined tag list shown in the Edit Tags quick picker. Tags not in this list can still be typed manually.",
+  "config.tags.scanWorkspace.description": "When enabled, Edit Tags also scans all notes in the workspace and adds any discovered tags to the picker candidates. Disable for large note collections to avoid performance impact.",
+  "config.versionControl.autoCommitInterval.description": "Auto-commit interval in minutes using Jujutsu. Set to 0 to disable.",
+  "config.versionControl.autoCommitMessage.description": "Commit message for auto-commits. Supports date tokens.",
+  "config.versionControl.useJujutsu.description": "Enable Jujutsu (jj) version control features. When false, all jj commands and toolbar buttons are hidden.\n\nJujutsu is a Git-compatible version control system. [Learn more](https://www.jj-vcs.dev/latest/) about Jujutsu."
+}

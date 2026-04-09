@@ -1,7 +1,7 @@
 {
   "name": "notes",
-  "displayName": "Notes",
-  "description": "Personal note-taking extension with templates, tags, and Jujutsu VCS integration",
+  "displayName": "%extension.displayName%",
+  "description": "%extension.description%",
   "version": "0.1.0",
   "publisher": "yuyosy",
   "engines": {
@@ -18,56 +18,56 @@
     "commands": [
       {
         "command": "notes.setup",
-        "title": "Notes: Setup Notes Folder"
+        "title": "%command.setup.title%"
       },
       {
         "command": "notes.newNote",
-        "title": "Notes: New Note",
+        "title": "%command.newNote.title%",
         "icon": "$(add)"
       },
       {
         "command": "notes.listNotes",
-        "title": "Notes: List Recent Notes"
+        "title": "%command.listNotes.title%"
       },
       {
         "command": "notes.listTags",
-        "title": "Notes: Browse by Tag"
+        "title": "%command.listTags.title%"
       },
       {
         "command": "notes.refresh",
-        "title": "Notes: Refresh View",
+        "title": "%command.refresh.title%",
         "icon": "$(refresh)"
       },
       {
         "command": "notes.jjDescribe",
-        "title": "Notes: Jujutsu - Describe (Commit Message)",
+        "title": "%command.jjDescribe.title%",
         "icon": "$(git-commit)"
       },
       {
         "command": "notes.jjNew",
-        "title": "Notes: Jujutsu - New Changeset",
+        "title": "%command.jjNew.title%",
         "icon": "$(git-branch)"
       },
       {
         "command": "notes.jjPush",
-        "title": "Notes: Jujutsu - Git Push"
+        "title": "%command.jjPush.title%"
       },
       {
         "command": "notes.jjFetch",
-        "title": "Notes: Jujutsu - Git Fetch"
+        "title": "%command.jjFetch.title%"
       },
       {
         "command": "notes.selectNotesFolder",
-        "title": "Notes: Select Notes Folder"
+        "title": "%command.selectNotesFolder.title%"
       },
       {
         "command": "notes.editTags",
-        "title": "Notes: Edit Tags",
+        "title": "%command.editTags.title%",
         "icon": "$(tag)"
       },
       {
         "command": "notes.renameItem",
-        "title": "Notes: Rename",
+        "title": "%command.renameItem.title%",
         "icon": "$(edit)"
       }
     ],
@@ -75,7 +75,7 @@
       "activitybar": [
         {
           "id": "notes-explorer",
-          "title": "Notes",
+          "title": "%viewsContainer.notes.title%",
           "icon": "resources/icon/notes.svg"
         }
       ]
@@ -84,7 +84,7 @@
       "notes-explorer": [
         {
           "id": "notesView",
-          "name": "Notes",
+          "name": "%view.notes.name%",
           "icon": "resources/icon/notes.svg"
         }
       ]
@@ -92,7 +92,7 @@
     "viewsWelcome": [
       {
         "view": "notesView",
-        "contents": "$(notebook) Notes\n\nNo notes folder configured yet.\nSelect a folder to start managing your Markdown notes.\n\n[$(folder-opened) Select Notes Folder](command:notes.selectNotesFolder)\n\nOr run `Notes: Setup Notes Folder` from the Command Palette (Ctrl+Shift+P).\n\nAlready have a path? $(settings-gear) [Open Settings](command:workbench.action.openSettings?%5B%22notes.notePath%22%5D) to set it directly.",
+        "contents": "%viewsWelcome.notesView.contents%",
         "when": "!notes.notesPathConfigured"
       }
     ],
@@ -133,27 +133,28 @@
       ]
     },
     "configuration": {
-      "title": "Notes",
+      "title": "%config.title%",
+      "id": "stable",
       "properties": {
         "notes.notePath": {
           "type": "string",
           "default": "",
-          "description": "Path to the notes folder"
+          "description": "%config.notePath.description%"
         },
         "notes.templatePath": {
           "type": "string",
           "default": "",
-          "description": "Path to the templates folder. Defaults to <notePath>/.templates if empty."
+          "description": "%config.templatePath.description%"
         },
         "notes.defaultNoteTitle": {
           "type": "string",
           "default": "{{title}}_{{YYYY-MM-DD}}",
-          "description": "File name format for new notes. Supports {{YYYY}}, {{MM}}, {{DD}}, {{HH}}, {{mm}}, {{ss}}, {{title}}."
+          "description": "%config.defaultNoteTitle.description%"
         },
         "notes.defaultExtension": {
           "type": "string",
           "default": "md",
-          "description": "Default file extension for new notes"
+          "description": "%config.defaultExtension.description%"
         },
         "notes.ignorePatterns": {
           "type": "array",
@@ -165,41 +166,46 @@
             ".jj",
             ".DS_Store"
           ],
-          "description": "Folder/file name patterns to ignore in the notes view"
+          "description": "%config.ignorePatterns.description%"
         },
         "notes.counterStartsAtOne": {
           "type": "boolean",
           "default": false,
-          "description": "When true, duplicate file counters start at 1 (e.g. {{N}}→_1, _2… or name_1, _2…). When false (default), the first file has no counter and conflicts begin at _2."
+          "description": "%config.counterStartsAtOne.description%"
         },
         "notes.tags.predefined": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "default": [],
-          "description": "Predefined tag list shown in the Edit Tags quick picker. Tags not in this list can still be typed manually."
+          "default": [
+            "scraps",
+            "tasks",
+            "ideas",
+            "daily-notes"
+          ],
+          "description": "%config.tags.predefined.description%"
         },
         "notes.tags.scanWorkspace": {
           "type": "boolean",
-          "default": false,
-          "description": "When enabled, Edit Tags also scans all notes in the workspace and adds any discovered tags to the picker candidates. Disable for large note collections to avoid performance impact."
+          "default": true,
+          "description": "%config.tags.scanWorkspace.description%"
         },
         "notes.versionControl.autoCommitInterval": {
           "type": "number",
           "default": 0,
           "minimum": 0,
-          "description": "Auto-commit interval in minutes using Jujutsu. Set to 0 to disable."
+          "description": "%config.versionControl.autoCommitInterval.description%"
         },
         "notes.versionControl.autoCommitMessage": {
           "type": "string",
           "default": "auto: {{YYYY-MM-DD HH:mm}}",
-          "description": "Commit message for auto-commits. Supports date tokens."
+          "description": "%config.versionControl.autoCommitMessage.description%"
         },
         "notes.versionControl.useJujutsu": {
           "type": "boolean",
           "default": true,
-          "description": "Enable Jujutsu (jj) version control features. When false, all jj commands and toolbar buttons are hidden."
+          "markdownDescription": "%config.versionControl.useJujutsu.description%"
         }
       }
     }

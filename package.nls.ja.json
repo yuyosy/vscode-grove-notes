@@ -1,0 +1,34 @@
+{
+  "extension.displayName": "Notes",
+  "extension.description": "テンプレート・タグ・Jujutsu バージョン管理に対応した個人用ノートアプリ",
+
+  "command.setup.title": "ノートフォルダーのセットアップ",
+  "command.newNote.title": "新規ノート作成",
+  "command.listNotes.title": "最近のノートを開く",
+  "command.listTags.title": "タグからノートを探す",
+  "command.refresh.title": "表示を更新",
+  "command.jjDescribe.title": "Jujutsu - コミットメッセージを編集(describe)",
+  "command.jjNew.title": "Jujutsu - 新しい変更を開始(new)",
+  "command.jjPush.title": "Jujutsu - Git Push",
+  "command.jjFetch.title": "Jujutsu - Git Fetch",
+  "command.selectNotesFolder.title": "ノートフォルダーを選択",
+  "command.editTags.title": "タグを編集",
+  "command.renameItem.title": "名前を変更",
+
+  "viewsContainer.notes.title": "Notes",
+  "view.notes.name": "Notes",
+  "viewsWelcome.notesView.contents": "$(notebook) Notes\n\nノートフォルダーがまだ設定されていません。\nフォルダーを選んで Markdown ノートを管理しましょう。\n\n[$(folder-opened) ノートフォルダーを選択](command:notes.selectNotesFolder)\n\nまたはコマンドパレット（Ctrl+Shift+P）で `Notes: Setup Notes Folder` を実行してください。\n\nパスを直接入力したい場合は $(settings-gear) [設定を開く](command:workbench.action.openSettings?%5B%22notes.notePath%22%5D) から指定できます。\n\nテンプレートパス・ノートタイトルの形式・除外パターン・タグ・Jujutsu 連携など、さまざまな設定が用意されています。\n\n$(settings-gear) [拡張機能の設定を開く](command:workbench.action.openSettings?%5B%22notes%22%5D)",
+
+  "config.title": "Notes",
+  "config.notePath.description": "ノートを保存するフォルダーのパスを指定します",
+  "config.templatePath.description": "テンプレートフォルダーのパスを指定します。空の場合は <notePath>/.templates が使われます。",
+  "config.defaultNoteTitle.description": "新規ノートのファイル名パターンです。{{YYYY}}・{{MM}}・{{DD}}・{{HH}}・{{mm}}・{{ss}}・{{title}} が使えます。",
+  "config.defaultExtension.description": "新規ノートのファイル拡張子（デフォルト: md）",
+  "config.ignorePatterns.description": "ノート一覧に表示しないフォルダーやファイルの名前パターン",
+  "config.counterStartsAtOne.description": "同名ファイルが重複したときの連番の開始値を変更します。true にすると _1 から始まり、false（デフォルト）では最初のファイルに番号が付かず、2件目から _2 になります。",
+  "config.tags.predefined.description": "タグ編集ピッカーに最初から表示しておくタグの一覧です。ここにないタグも直接入力して追加できます。",
+  "config.tags.scanWorkspace.description": "オンにすると、タグ編集時にノートフォルダー内の全ファイルをスキャンして使用済みタグを候補に追加します。ノート数が多い場合はオフにすることをおすすめします。",
+  "config.versionControl.autoCommitInterval.description": "Jujutsu による自動コミットの実行間隔（単位: 分）。0 にすると無効になります。",
+  "config.versionControl.autoCommitMessage.description": "自動コミット時に使うメッセージです。{{YYYY-MM-DD HH:mm}} などの日付トークンが使えます。",
+  "config.versionControl.useJujutsu.description": "Jujutsu (jj) によるバージョン管理機能を使うかどうかを切り替えます。オフにするとツールバーの jj ボタンやコマンドがすべて非表示になります。\n\nJujutsu は Git 互換のバージョン管理システムです。詳しくは[Jujutsu Docs](https://www.jj-vcs.dev/latest/)を参照。"
+}
