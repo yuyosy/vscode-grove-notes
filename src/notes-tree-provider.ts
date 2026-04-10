@@ -1,10 +1,15 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
-import { getIgnorePatterns, getNotePath } from './config';
+import { getNotePath, getUseGitignore, getViewHiddenPatterns } from './config';
 import type { NoteTreeItem, TagIndex } from './types';
-import { readDirEntries, walkDir } from './utils/file-utils';
+import {
+  readDirEntries,
+  SYSTEM_IGNORE_PATTERNS,
+  walkDir,
+} from './utils/file-utils';
 import { parseFrontMatter } from './utils/front-matter';
+import { readGitignorePatterns } from './utils/gitignore-utils';
 
 export class NotesTreeItem extends vscode.TreeItem {
   constructor(
@@ -98,8 +103,18 @@ export class NotesTreeProvider
   }
 
   private _getDirChildren(dirPath: string): NotesTreeItem[] {
-    const ignorePatterns = getIgnorePatterns();
-    const entries = readDirEntries(dirPath, ignorePatterns);
+    const notePath = getNotePath();
+    const gitignorePatterns =
+      notePath && getUseGitignore() ? readGitignorePatterns(notePath) : [];
+    const hiddenPatterns = getViewHiddenPatterns();
+    const viewPatterns = [
+      ...new Set([
+        ...SYSTEM_IGNORE_PATTERNS,
+        ...gitignorePatterns,
+        ...hiddenPatterns,
+      ]),
+    ];
+    const entries = readDirEntries(dirPath, viewPatterns);
 
     // Directories first, then files, each sorted alphabetically
     const dirs = entries.filter((e) => e.isDirectory);
@@ -137,8 +152,14 @@ export class NotesTreeProvider
     const notePath = getNotePath();
     if (!notePath) return [];
 
-    const ignorePatterns = getIgnorePatterns();
-    const tagIndex = this._buildTagIndex(notePath, ignorePatterns);
+    const ignorePatterns = [...SYSTEM_IGNORE_PATTERNS];
+    const gitignorePatterns = getUseGitignore()
+      ? readGitignorePatterns(notePath)
+      : [];
+    const scanPatterns = [
+      ...new Set([...ignorePatterns, ...gitignorePatterns]),
+    ];
+    const tagIndex = this._buildTagIndex(notePath, scanPatterns);
     const sortedTags = Object.keys(tagIndex).sort();
 
     return sortedTags.map((tag) => {

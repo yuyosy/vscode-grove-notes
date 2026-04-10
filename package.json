@@ -69,6 +69,10 @@
         "command": "notes.renameItem",
         "title": "%command.renameItem.title%",
         "icon": "$(edit)"
+      },
+      {
+        "command": "notes.openGitignore",
+        "title": "%command.openGitignore.title%"
       }
     ],
     "viewsContainers": {
@@ -156,17 +160,21 @@
           "default": "md",
           "description": "%config.defaultExtension.description%"
         },
-        "notes.ignorePatterns": {
+        "notes.view.hiddenPatterns": {
           "type": "array",
           "items": {
             "type": "string"
           },
           "default": [
-            ".git",
-            ".jj",
-            ".DS_Store"
+            ".gitignore",
+            ".templates"
           ],
-          "description": "%config.ignorePatterns.description%"
+          "description": "%config.view.hiddenPatterns.description%"
+        },
+        "notes.view.useGitignore": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "%config.view.useGitignore.description%"
         },
         "notes.counterStartsAtOne": {
           "type": "boolean",
@@ -220,5 +228,8 @@
     "@types/node": "^25.5.2",
     "@types/vscode": "^1.115.0",
     "typescript": "^6.0.2"
+  },
+  "dependencies": {
+    "minimatch": "^10.2.5"
   }
 }

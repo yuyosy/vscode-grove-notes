@@ -1,12 +1,14 @@
 import * as fs from 'node:fs';
 import * as vscode from 'vscode';
 import {
-  getIgnorePatterns,
   getNotePath,
   getPredefinedTags,
   getScanWorkspaceTags,
+  getUseGitignore,
 } from '../config';
+import { SYSTEM_IGNORE_PATTERNS } from '../utils/file-utils';
 import { parseFrontMatter, writeTags } from '../utils/front-matter';
+import { readGitignorePatterns } from '../utils/gitignore-utils';
 import { buildTagIndex } from './list-tags';
 
 /**
@@ -39,7 +41,13 @@ export async function editTags(filePath: string): Promise<void> {
   if (getScanWorkspaceTags()) {
     const notePath = getNotePath();
     if (notePath) {
-      workspaceTags = Object.keys(buildTagIndex(notePath, getIgnorePatterns()));
+      const gitignorePatterns = getUseGitignore()
+        ? readGitignorePatterns(notePath)
+        : [];
+      const scanPatterns = [
+        ...new Set([...SYSTEM_IGNORE_PATTERNS, ...gitignorePatterns]),
+      ];
+      workspaceTags = Object.keys(buildTagIndex(notePath, scanPatterns));
     }
   }
 

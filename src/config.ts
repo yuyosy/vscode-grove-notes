@@ -29,12 +29,14 @@ export function getDefaultExtension(): string {
   return getConfig().get<string>('defaultExtension', 'md');
 }
 
-export function getIgnorePatterns(): string[] {
-  return getConfig().get<string[]>('ignorePatterns', [
-    '.git',
-    '.jj',
-    '.DS_Store',
-  ]);
+/** Patterns hidden from the tree view only; still scanned for tags and recent notes. */
+export function getViewHiddenPatterns(): string[] {
+  return getConfig().get<string[]>('view.hiddenPatterns', ['.templates']);
+}
+
+/** When true, .gitignore patterns in the notes folder are applied to all scans. */
+export function getUseGitignore(): boolean {
+  return getConfig().get<boolean>('view.useGitignore', true);
 }
 
 /** When true, file counters start at 1 ({{N}}→_1, no-token→_1). Default false (start at 2). */

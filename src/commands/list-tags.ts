@@ -1,10 +1,11 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
-import { getIgnorePatterns, getNotePath } from '../config';
+import { getNotePath, getUseGitignore } from '../config';
 import type { TagIndex } from '../types';
-import { walkDir } from '../utils/file-utils';
+import { SYSTEM_IGNORE_PATTERNS, walkDir } from '../utils/file-utils';
 import { parseFrontMatter } from '../utils/front-matter';
+import { readGitignorePatterns } from '../utils/gitignore-utils';
 
 export async function listTags(): Promise<void> {
   const notePath = getNotePath();
@@ -13,7 +14,13 @@ export async function listTags(): Promise<void> {
     return;
   }
 
-  const tagIndex = buildTagIndex(notePath, getIgnorePatterns());
+  const gitignorePatterns = getUseGitignore()
+    ? readGitignorePatterns(notePath)
+    : [];
+  const scanPatterns = [
+    ...new Set([...SYSTEM_IGNORE_PATTERNS, ...gitignorePatterns]),
+  ];
+  const tagIndex = buildTagIndex(notePath, scanPatterns);
   const tags = Object.keys(tagIndex).sort();
 
   if (tags.length === 0) {

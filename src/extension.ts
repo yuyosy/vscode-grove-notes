@@ -10,6 +10,7 @@ import {
 import { listNotes } from './commands/list-notes';
 import { listTags } from './commands/list-tags';
 import { newNote } from './commands/new-note';
+import { openGitignore } from './commands/open-gitignore';
 import { renameItem } from './commands/rename-item';
 import { maybeInitJj, selectNotesFolder, setupNotes } from './commands/setup';
 import { getAutoCommitInterval, getNotePath, getUseJujutsu } from './config';
@@ -96,6 +97,8 @@ export function activate(context: vscode.ExtensionContext) {
       (item: { data: { filePath?: string } }) =>
         renameItem(item?.data?.filePath ?? ''),
     ),
+
+    vscode.commands.registerCommand('notes.openGitignore', openGitignore),
   );
 
   // Auto-commit timer

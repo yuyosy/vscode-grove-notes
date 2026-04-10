@@ -14,6 +14,7 @@
   "command.selectNotesFolder.title": "Select Notes Folder",
   "command.editTags.title": "Edit Tags",
   "command.renameItem.title": "Rename",
+  "command.openGitignore.title": "Notes: Open .gitignore",
 
   "viewsContainer.notes.title": "Notes",
   "view.notes.name": "Notes",
@@ -24,7 +25,8 @@
   "config.templatePath.description": "Path to the templates folder. Defaults to <notePath>/.templates if empty.",
   "config.defaultNoteTitle.description": "File name format for new notes. Supports {{YYYY}}, {{MM}}, {{DD}}, {{HH}}, {{mm}}, {{ss}}, {{title}}.",
   "config.defaultExtension.description": "Default file extension for new notes",
-  "config.ignorePatterns.description": "Folder/file name patterns to ignore in the notes view",
+  "config.view.hiddenPatterns.description": "Folder/file name patterns to hide from the tree view only. These folders are still scanned for tags and recent notes. Supports glob patterns (e.g. `_*`, `*.draft`).",
+  "config.view.useGitignore.description": "When enabled, patterns from the `.gitignore` file in the notes folder are applied to all scans (tags, recent notes, tree view). `.git` and `.jj` are always excluded regardless of this setting.\n\nNegation patterns (`!`) are ignored. Path-based patterns such as `src/**/*.tmp` are supported.\n\n[Open .gitignore](command:notes.openGitignore)",
   "config.counterStartsAtOne.description": "When true, duplicate file counters start at 1 (e.g. {{N}}\u2192_1, _2\u2026 or name_1, _2\u2026). When false (default), the first file has no counter and conflicts begin at _2.",
   "config.tags.predefined.description": "Predefined tag list shown in the Edit Tags quick picker. Tags not in this list can still be typed manually.",
   "config.tags.scanWorkspace.description": "When enabled, Edit Tags also scans all notes in the workspace and adds any discovered tags to the picker candidates. Disable for large note collections to avoid performance impact.",
