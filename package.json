@@ -50,6 +50,16 @@
         "icon": "$(git-branch)"
       },
       {
+        "command": "notes.jjUndo",
+        "title": "%command.jjUndo.title%",
+        "icon": "$(discard)"
+      },
+      {
+        "command": "notes.jjRedo",
+        "title": "%command.jjRedo.title%",
+        "icon": "$(redo)"
+      },
+      {
         "command": "notes.jjPush",
         "title": "%command.jjPush.title%"
       },
@@ -122,6 +132,16 @@
           "command": "notes.refresh",
           "when": "view == notesView",
           "group": "navigation@4"
+        },
+        {
+          "command": "notes.jjUndo",
+          "when": "view == notesView && notes.jjEnabled",
+          "group": "1_vcs@3"
+        },
+        {
+          "command": "notes.jjRedo",
+          "when": "view == notesView && notes.jjEnabled",
+          "group": "1_vcs@4"
         }
       ],
       "view/item/context": [

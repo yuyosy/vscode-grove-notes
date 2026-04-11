@@ -5,6 +5,8 @@ import {
   jjFetch,
   jjNew,
   jjPush,
+  jjRedo,
+  jjUndo,
   startAutoCommit,
 } from './commands/jj-operations';
 import { listNotes } from './commands/list-notes';
@@ -84,6 +86,8 @@ export function activate(context: vscode.ExtensionContext) {
 
     vscode.commands.registerCommand('notes.jjDescribe', jjDescribe),
     vscode.commands.registerCommand('notes.jjNew', jjNew),
+    vscode.commands.registerCommand('notes.jjUndo', jjUndo),
+    vscode.commands.registerCommand('notes.jjRedo', jjRedo),
     vscode.commands.registerCommand('notes.jjPush', jjPush),
     vscode.commands.registerCommand('notes.jjFetch', jjFetch),
 

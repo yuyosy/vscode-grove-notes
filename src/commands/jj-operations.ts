@@ -127,6 +127,32 @@ export async function jjInit(folderPath: string): Promise<void> {
   }
 }
 
+export async function jjUndo(): Promise<void> {
+  const notePath = requireNotePath();
+  if (!notePath) return;
+
+  try {
+    await runJj(['undo'], notePath);
+    vscode.window.showInformationMessage('VCS: Last operation undone.');
+  } catch (err: unknown) {
+    vscode.window.showErrorMessage(`jj undo failed: ${(err as Error).message}`);
+  }
+}
+
+export async function jjRedo(): Promise<void> {
+  const notePath = requireNotePath();
+  if (!notePath) return;
+
+  try {
+    await runJj(['op', 'redo'], notePath);
+    vscode.window.showInformationMessage('VCS: Redo successful.');
+  } catch (err: unknown) {
+    vscode.window.showErrorMessage(
+      `jj op redo failed: ${(err as Error).message}`,
+    );
+  }
+}
+
 /**
  * Starts an auto-commit timer that runs `jj describe && jj new` at the given interval.
  * Returns a Disposable that clears the timer.

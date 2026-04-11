@@ -9,6 +9,8 @@
   "command.refresh.title": "表示を更新",
   "command.jjDescribe.title": "Jujutsu - コミットメッセージを編集(describe)",
   "command.jjNew.title": "Jujutsu - 新しい変更を開始(new)",
+  "command.jjUndo.title": "Jujutsu - 元に戻す",
+  "command.jjRedo.title": "Jujutsu - やり直し",
   "command.jjPush.title": "Jujutsu - Git Push",
   "command.jjFetch.title": "Jujutsu - Git Fetch",
   "command.selectNotesFolder.title": "ノートフォルダーを選択",

@@ -9,6 +9,8 @@
   "command.refresh.title": "Refresh View",
   "command.jjDescribe.title": "Jujutsu - Describe (Commit Message)",
   "command.jjNew.title": "Jujutsu - New Changeset",
+  "command.jjUndo.title": "Jujutsu - Undo",
+  "command.jjRedo.title": "Jujutsu - Redo",
   "command.jjPush.title": "Jujutsu - Git Push",
   "command.jjFetch.title": "Jujutsu - Git Fetch",
   "command.selectNotesFolder.title": "Select Notes Folder",
