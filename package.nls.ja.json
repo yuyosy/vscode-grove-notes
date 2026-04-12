@@ -1,6 +1,6 @@
 {
-  "extension.displayName": "Notes",
-  "extension.description": "テンプレート・タグ・Jujutsu バージョン管理に対応した個人用ノートアプリ",
+  "extension.displayName": "GroveNotes - Notes Tree View",
+  "extension.description": "Manage your notes in a tree view directly from the sidebar in VS Code and VS Code-based editors.",
 
   "command.setup.title": "ノートフォルダーのセットアップ",
   "command.newNote.title": "新規ノート作成",
