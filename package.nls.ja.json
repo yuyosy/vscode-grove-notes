@@ -34,5 +34,11 @@
   "config.tags.scanWorkspace.description": "オンにすると、タグ編集時にノートフォルダー内の全ファイルをスキャンして使用済みタグを候補に追加します。ノート数が多い場合はオフにすることをおすすめします。",
   "config.versionControl.autoCommitInterval.description": "Jujutsu による自動コミットの実行間隔（単位: 分）。0 にすると無効になります。",
   "config.versionControl.autoCommitMessage.description": "自動コミット時に使うメッセージです。{{YYYY-MM-DD HH:mm}} などの日付トークンが使えます。",
-  "config.versionControl.useJujutsu.description": "Jujutsu (jj) によるバージョン管理機能を使うかどうかを切り替えます。オフにするとツールバーの jj ボタンやコマンドがすべて非表示になります。\n\nJujutsu は Git 互換のバージョン管理システムです。詳しくは[Jujutsu Docs](https://www.jj-vcs.dev/latest/)を参照。"
+  "config.versionControl.useJujutsu.description": "Jujutsu (jj) によるバージョン管理機能を使うかどうかを切り替えます。オフにするとツールバーの jj ボタンやコマンドがすべて非表示になります。\n\nJujutsu は Git 互換のバージョン管理システムです。詳しくは[Jujutsu Docs](https://www.jj-vcs.dev/latest/)を参照。",
+  "config.versionControl.jjInitMode.description": "ノートフォルダーを選択したとき、`.jj` リポジトリが存在しない場合に jj を自動初期化するかどうかを制御します。",
+  "config.versionControl.jjInitMode.never": "自動初期化しない。",
+  "config.versionControl.jjInitMode.always": ".git の有無に関係なく、確認なしで常に初期化する。",
+  "config.versionControl.jjInitMode.ask": "常に確認ダイアログを表示してから初期化する。",
+  "config.versionControl.jjInitMode.askIfGit": ".git が検出された場合のみ確認ダイアログを表示する。それ以外はスキップ。",
+  "config.versionControl.jjInitMode.autoAsk": ".git がない場合は確認なしで自動初期化し、.git がある場合は確認ダイアログを表示する。"
 }

@@ -34,5 +34,11 @@
   "config.tags.scanWorkspace.description": "When enabled, Edit Tags also scans all notes in the workspace and adds any discovered tags to the picker candidates. Disable for large note collections to avoid performance impact.",
   "config.versionControl.autoCommitInterval.description": "Auto-commit interval in minutes using Jujutsu. Set to 0 to disable.",
   "config.versionControl.autoCommitMessage.description": "Commit message for auto-commits. Supports date tokens.",
-  "config.versionControl.useJujutsu.description": "Enable Jujutsu (jj) version control features. When false, all jj commands and toolbar buttons are hidden.\n\nJujutsu is a Git-compatible version control system. [Learn more](https://www.jj-vcs.dev/latest/) about Jujutsu."
+  "config.versionControl.useJujutsu.description": "Enable Jujutsu (jj) version control features. When false, all jj commands and toolbar buttons are hidden.\n\nJujutsu is a Git-compatible version control system. [Learn more](https://www.jj-vcs.dev/latest/) about Jujutsu.",
+  "config.versionControl.jjInitMode.description": "Controls whether jj is automatically initialized when a notes folder is selected and no .jj repository exists.",
+  "config.versionControl.jjInitMode.never": "Never initialize automatically.",
+  "config.versionControl.jjInitMode.always": "Always initialize without asking, whether or not a .git repository exists.",
+  "config.versionControl.jjInitMode.ask": "Always show a confirmation dialog before initializing.",
+  "config.versionControl.jjInitMode.askIfGit": "Show a confirmation dialog only when a .git repository is detected. Skip otherwise.",
+  "config.versionControl.jjInitMode.autoAsk": "Initialize automatically when no .git exists. Show a confirmation dialog when .git is detected."
 }

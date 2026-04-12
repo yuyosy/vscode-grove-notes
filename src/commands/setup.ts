@@ -1,7 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
-import { getUseJujutsu, setNotePath } from '../config';
+import { getJjInitMode, getUseJujutsu, setNotePath } from '../config';
 import { isJjAvailable } from '../utils/jj-resolver';
 
 export async function setupNotes(): Promise<void> {
@@ -40,7 +40,14 @@ export async function selectNotesFolder(): Promise<void> {
 
 /**
  * Checks whether a jj repo exists in `folderPath`.
- * If not (and jj is enabled/available), offers to run `jj init`.
+ * If not (and jj is enabled/available), offers to run `jj init`
+ * according to the `versionControl.jjInitMode` setting.
+ *
+ *   never    – do nothing
+ *   always   – init without asking
+ *   ask      – always show a confirmation dialog
+ *   askIfGit – show dialog only when .git is present; skip otherwise
+ *   autoAsk  – auto-init when no .git; show dialog when .git is present
  */
 export async function maybeInitJj(folderPath: string): Promise<void> {
   if (!getUseJujutsu() || !isJjAvailable()) return;
@@ -48,14 +55,36 @@ export async function maybeInitJj(folderPath: string): Promise<void> {
   const jjDir = path.join(folderPath, '.jj');
   if (fs.existsSync(jjDir)) return; // already initialised
 
+  const mode = getJjInitMode();
+  if (mode === 'never') return;
+
+  const gitExists = fs.existsSync(path.join(folderPath, '.git'));
+  const { jjInit } = await import('./jj-operations');
+
+  if (mode === 'always') {
+    await jjInit(folderPath);
+    return;
+  }
+
+  if (mode === 'autoAsk' && !gitExists) {
+    await jjInit(folderPath);
+    return;
+  }
+
+  if (mode === 'askIfGit' && !gitExists) return;
+
+  // Reach here for: ask (always), askIfGit (git exists), autoAsk (git exists)
+  const detail = gitExists
+    ? 'A .git repository was detected. jj will be initialized in colocated mode (jj git init --colocate).'
+    : 'jj will be initialized in the notes folder.';
+
   const answer = await vscode.window.showInformationMessage(
     'No Jujutsu repository found in the notes folder. Initialize one now?',
-    'Yes, run jj init',
+    { detail, modal: false },
+    'Yes',
     'No',
   );
-  if (answer !== 'Yes, run jj init') return;
+  if (answer !== 'Yes') return;
 
-  // Dynamic import to avoid circular dependency at module load time
-  const { jjInit } = await import('./jj-operations');
   await jjInit(folderPath);
 }

@@ -235,6 +235,25 @@
           "type": "boolean",
           "default": true,
           "markdownDescription": "%config.versionControl.useJujutsu.description%"
+        },
+        "notes.versionControl.jjInitMode": {
+          "type": "string",
+          "enum": [
+            "never",
+            "always",
+            "ask",
+            "askIfGit",
+            "autoAsk"
+          ],
+          "enumDescriptions": [
+            "%config.versionControl.jjInitMode.never%",
+            "%config.versionControl.jjInitMode.always%",
+            "%config.versionControl.jjInitMode.ask%",
+            "%config.versionControl.jjInitMode.askIfGit%",
+            "%config.versionControl.jjInitMode.autoAsk%"
+          ],
+          "default": "askIfGit",
+          "description": "%config.versionControl.jjInitMode.description%"
         }
       }
     }

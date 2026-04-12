@@ -59,6 +59,20 @@ export function getUseJujutsu(): boolean {
   return getConfig().get<boolean>('versionControl.useJujutsu', true);
 }
 
+export type JjInitMode = 'never' | 'always' | 'ask' | 'askIfGit' | 'autoAsk';
+
+/**
+ * Controls automatic jj init behaviour when a notes folder is selected.
+ *   never     – do nothing
+ *   always    – init without asking (plain or colocated)
+ *   ask       – always show a dialog
+ *   askIfGit  – show dialog only when .git exists, otherwise skip
+ *   autoAsk   – init automatically when no .git, ask when .git exists
+ */
+export function getJjInitMode(): JjInitMode {
+  return getConfig().get<JjInitMode>('versionControl.jjInitMode', 'askIfGit');
+}
+
 export function getAutoCommitInterval(): number {
   return getConfig().get<number>('versionControl.autoCommitInterval', 0);
 }
