@@ -15,7 +15,7 @@ import {
   resolveUniqueFilePath,
 } from '../utils/template';
 
-export async function newNote(): Promise<void> {
+export async function newNote(folderPath?: string): Promise<void> {
   const notePath = getNotePath();
   if (!notePath) {
     const choice = await vscode.window.showWarningMessage(
@@ -75,7 +75,9 @@ export async function newNote(): Promise<void> {
   // Support sub-folder via "/" in baseName (e.g. title = "projects/my-note")
   const subDir = path.dirname(baseName);
   const cleanBase = path.basename(baseName);
-  const targetDir = subDir === '.' ? notePath : path.join(notePath, subDir);
+  // folderPath: target directory from "New Note in Folder" context menu
+  const baseDir = folderPath ?? notePath;
+  const targetDir = subDir === '.' ? baseDir : path.join(baseDir, subDir);
 
   // 4. Resolve unique path
   //    - {{N}} / {{N:00}} in the pattern → replaced with counter

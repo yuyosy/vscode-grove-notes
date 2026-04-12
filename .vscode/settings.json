@@ -18,5 +18,8 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit",
     "source.fixAll": "explicit"
+  },
+  "chat.tools.terminal.autoApprove": {
+    "jj": true
   }
 }

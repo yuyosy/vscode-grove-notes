@@ -1,4 +1,6 @@
+import * as path from 'node:path';
 import * as vscode from 'vscode';
+import { deleteItem } from './commands/delete-item';
 import { editTags } from './commands/edit-tags';
 import {
   jjDescribe,
@@ -15,8 +17,13 @@ import { newNote } from './commands/new-note';
 import { openGitignore } from './commands/open-gitignore';
 import { renameItem } from './commands/rename-item';
 import { maybeInitJj, selectNotesFolder, setupNotes } from './commands/setup';
+import { viewDiff } from './commands/view-diff';
 import { getAutoCommitInterval, getNotePath, getUseJujutsu } from './config';
 import { NotesTreeProvider } from './notes-tree-provider';
+import {
+  JJ_PARENT_SCHEME,
+  JjParentContentProvider,
+} from './utils/jj-content-provider';
 import { initJjPath, isJjAvailable, jjSource } from './utils/jj-resolver';
 
 /** Syncs the `notes.jjEnabled` context key used by `when` clauses in package.json. */
@@ -64,6 +71,11 @@ export function activate(context: vscode.ExtensionContext) {
   const treeProvider = new NotesTreeProvider();
 
   context.subscriptions.push(
+    vscode.workspace.registerTextDocumentContentProvider(
+      JJ_PARENT_SCHEME,
+      new JjParentContentProvider(),
+    ),
+
     vscode.window.registerTreeDataProvider('notesView', treeProvider),
 
     vscode.commands.registerCommand('notes.setup', async () => {
@@ -77,6 +89,11 @@ export function activate(context: vscode.ExtensionContext) {
     }),
 
     vscode.commands.registerCommand('notes.newNote', newNote),
+    vscode.commands.registerCommand(
+      'notes.newNoteInFolder',
+      (item: { data: { filePath?: string } }) =>
+        newNote(item?.data?.filePath ?? undefined),
+    ),
     vscode.commands.registerCommand('notes.listNotes', listNotes),
     vscode.commands.registerCommand('notes.listTags', listTags),
 
@@ -100,6 +117,38 @@ export function activate(context: vscode.ExtensionContext) {
       'notes.renameItem',
       (item: { data: { filePath?: string } }) =>
         renameItem(item?.data?.filePath ?? ''),
+    ),
+    vscode.commands.registerCommand(
+      'notes.deleteItem',
+      (item: { data: { filePath?: string } }) =>
+        deleteItem(item?.data?.filePath ?? ''),
+    ),
+    vscode.commands.registerCommand(
+      'notes.viewDiff',
+      (item: { data: { filePath?: string } }) =>
+        viewDiff(item?.data?.filePath ?? ''),
+    ),
+    vscode.commands.registerCommand(
+      'notes.revealInExplorer',
+      (item: { data: { filePath?: string } }) => {
+        const fp = item?.data?.filePath;
+        if (fp) {
+          vscode.commands.executeCommand('revealFileInOS', vscode.Uri.file(fp));
+        }
+      },
+    ),
+    vscode.commands.registerCommand(
+      'notes.copyPath',
+      (item: { data: { filePath?: string } }) => {
+        const fp = item?.data?.filePath;
+        if (!fp) return;
+        const sep = vscode.workspace
+          .getConfiguration('explorer')
+          .get<string>('copyPathSeparator', path.sep);
+        const normalized =
+          sep === '/' ? fp.replace(/\\/g, '/') : fp.replace(/\//g, '\\');
+        vscode.env.clipboard.writeText(normalized);
+      },
     ),
 
     vscode.commands.registerCommand('notes.openGitignore', openGitignore),

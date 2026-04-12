@@ -1,9 +1,10 @@
-import { execFile } from 'node:child_process';
+import { execFile, execFileSync } from 'node:child_process';
+import * as path from 'node:path';
 import { promisify } from 'node:util';
 import * as vscode from 'vscode';
 import { getAutoCommitMessage, getNotePath } from '../config';
 import { formatDateTokens } from '../utils/date-format';
-import { getJjPath } from '../utils/jj-resolver';
+import { getJjPath, isJjAvailable } from '../utils/jj-resolver';
 
 const execFileAsync = promisify(execFile);
 
@@ -150,6 +151,31 @@ export async function jjRedo(): Promise<void> {
     vscode.window.showErrorMessage(
       `jj op redo failed: ${(err as Error).message}`,
     );
+  }
+}
+
+/**
+ * Synchronously returns the set of absolute file paths that have changes in
+ * the current working copy (equivalent to `jj diff --name-only`).
+ * Returns an empty set when jj is unavailable or the folder is not a jj repo.
+ */
+export function getJjModifiedFiles(notePath: string): Set<string> {
+  if (!isJjAvailable()) return new Set();
+  try {
+    const output = execFileSync(getJjPath(), ['diff', '--name-only'], {
+      cwd: notePath,
+      encoding: 'utf8',
+      windowsHide: true,
+    });
+    return new Set(
+      output
+        .split(/\r?\n/)
+        .map((l) => l.trim())
+        .filter(Boolean)
+        .map((rel) => path.join(notePath, rel)),
+    );
+  } catch {
+    return new Set();
   }
 }
 

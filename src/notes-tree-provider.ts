@@ -1,7 +1,13 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
-import { getNotePath, getUseGitignore, getViewHiddenPatterns } from './config';
+import { getJjModifiedFiles } from './commands/jj-operations';
+import {
+  getNotePath,
+  getUseGitignore,
+  getUseJujutsu,
+  getViewHiddenPatterns,
+} from './config';
 import type { NoteTreeItem, TagIndex } from './types';
 import {
   readDirEntries,
@@ -10,11 +16,13 @@ import {
 } from './utils/file-utils';
 import { parseFrontMatter } from './utils/front-matter';
 import { readGitignorePatterns } from './utils/gitignore-utils';
+import { isJjAvailable } from './utils/jj-resolver';
 
 export class NotesTreeItem extends vscode.TreeItem {
   constructor(
     public readonly data: NoteTreeItem,
     collapsibleState: vscode.TreeItemCollapsibleState,
+    modifiedFiles?: Set<string>,
   ) {
     super(data.label, collapsibleState);
 
@@ -25,7 +33,8 @@ export class NotesTreeItem extends vscode.TreeItem {
         title: 'Open Note',
         arguments: [vscode.Uri.file(data.filePath)],
       };
-      this.contextValue = 'noteFile';
+      const isModified = modifiedFiles?.has(data.filePath) ?? false;
+      this.contextValue = isModified ? 'noteFileModified' : 'noteFile';
     } else if (data.kind === 'dir') {
       this.contextValue = 'noteDir';
       this.iconPath = new vscode.ThemeIcon('folder');
@@ -71,11 +80,15 @@ export class NotesTreeProvider
     if (kind === 'rootFile') {
       const notePath = getNotePath();
       if (!notePath) return [];
-      return this._getDirChildren(notePath);
+      return this._getDirChildren(notePath, this._getModifiedFiles(notePath));
     }
 
     if (kind === 'dir' && element.data.filePath) {
-      return this._getDirChildren(element.data.filePath);
+      const notePath = getNotePath();
+      return this._getDirChildren(
+        element.data.filePath,
+        this._getModifiedFiles(notePath ?? ''),
+      );
     }
 
     if (kind === 'rootTag') {
@@ -83,7 +96,9 @@ export class NotesTreeProvider
     }
 
     if (kind === 'tag' && element.data.files) {
-      return element.data.files.map((f) => this._makeFileItem(f));
+      const notePath = getNotePath();
+      const modified = this._getModifiedFiles(notePath ?? '');
+      return element.data.files.map((f) => this._makeFileItem(f, modified));
     }
 
     return [];
@@ -102,7 +117,15 @@ export class NotesTreeProvider
     ];
   }
 
-  private _getDirChildren(dirPath: string): NotesTreeItem[] {
+  private _getModifiedFiles(notePath: string): Set<string> {
+    if (!notePath || !getUseJujutsu() || !isJjAvailable()) return new Set();
+    return getJjModifiedFiles(notePath);
+  }
+
+  private _getDirChildren(
+    dirPath: string,
+    modifiedFiles: Set<string>,
+  ): NotesTreeItem[] {
     const notePath = getNotePath();
     const gitignorePatterns =
       notePath && getUseGitignore() ? readGitignorePatterns(notePath) : [];
@@ -133,19 +156,25 @@ export class NotesTreeProvider
 
     for (const f of files) {
       result.push(
-        this._makeFileItem({
-          kind: 'file',
-          label: f.name,
-          filePath: f.fullPath,
-        }),
+        this._makeFileItem(
+          { kind: 'file', label: f.name, filePath: f.fullPath },
+          modifiedFiles,
+        ),
       );
     }
 
     return result;
   }
 
-  private _makeFileItem(data: NoteTreeItem): NotesTreeItem {
-    return new NotesTreeItem(data, vscode.TreeItemCollapsibleState.None);
+  private _makeFileItem(
+    data: NoteTreeItem,
+    modifiedFiles?: Set<string>,
+  ): NotesTreeItem {
+    return new NotesTreeItem(
+      data,
+      vscode.TreeItemCollapsibleState.None,
+      modifiedFiles,
+    );
   }
 
   private _getTagNodes(): NotesTreeItem[] {

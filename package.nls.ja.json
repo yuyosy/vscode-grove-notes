@@ -16,6 +16,11 @@
   "command.selectNotesFolder.title": "ノートフォルダーを選択",
   "command.editTags.title": "タグを編集",
   "command.renameItem.title": "名前を変更",
+  "command.deleteItem.title": "削除",
+  "command.newNoteInFolder.title": "このフォルダーに新規ノート作成",
+  "command.revealInExplorer.title": "エクスプローラーで表示",
+  "command.copyPath.title": "パスをコピー",
+  "command.viewDiff.title": "変更を表示 (Diff)",
   "command.openGitignore.title": "Notes: .gitignore を開く",
 
   "viewsContainer.notes.title": "Notes",

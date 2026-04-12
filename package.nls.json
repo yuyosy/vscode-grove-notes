@@ -16,6 +16,11 @@
   "command.selectNotesFolder.title": "Select Notes Folder",
   "command.editTags.title": "Edit Tags",
   "command.renameItem.title": "Rename",
+  "command.deleteItem.title": "Delete",
+  "command.newNoteInFolder.title": "New Note in Folder",
+  "command.revealInExplorer.title": "Reveal in File Explorer",
+  "command.copyPath.title": "Copy Path",
+  "command.viewDiff.title": "View Changes (Diff)",
   "command.openGitignore.title": "Notes: Open .gitignore",
 
   "viewsContainer.notes.title": "Notes",

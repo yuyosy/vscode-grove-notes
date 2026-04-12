@@ -82,6 +82,29 @@
         "icon": "$(edit)"
       },
       {
+        "command": "notes.deleteItem",
+        "title": "%command.deleteItem.title%",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "notes.newNoteInFolder",
+        "title": "%command.newNoteInFolder.title%",
+        "icon": "$(add)"
+      },
+      {
+        "command": "notes.revealInExplorer",
+        "title": "%command.revealInExplorer.title%"
+      },
+      {
+        "command": "notes.copyPath",
+        "title": "%command.copyPath.title%"
+      },
+      {
+        "command": "notes.viewDiff",
+        "title": "%command.viewDiff.title%",
+        "icon": "$(diff)"
+      },
+      {
         "command": "notes.openGitignore",
         "title": "%command.openGitignore.title%"
       }
@@ -147,13 +170,48 @@
       "view/item/context": [
         {
           "command": "notes.editTags",
-          "when": "view == notesView && viewItem == noteFile",
+          "when": "view == notesView && viewItem =~ /noteFile/",
           "group": "notes_1_tags@1"
         },
         {
+          "command": "notes.editTags",
+          "when": "view == notesView && viewItem =~ /noteFile/",
+          "group": "inline@1"
+        },
+        {
+          "command": "notes.viewDiff",
+          "when": "view == notesView && viewItem == noteFileModified && notes.jjEnabled",
+          "group": "inline@2"
+        },
+        {
           "command": "notes.renameItem",
-          "when": "view == notesView && (viewItem == noteFile || viewItem == noteDir)",
+          "when": "view == notesView && (viewItem =~ /noteFile/ || viewItem == noteDir)",
           "group": "notes_2_file@1"
+        },
+        {
+          "command": "notes.newNoteInFolder",
+          "when": "view == notesView && viewItem == noteDir",
+          "group": "notes_2_file@2"
+        },
+        {
+          "command": "notes.deleteItem",
+          "when": "view == notesView && (viewItem =~ /noteFile/ || viewItem == noteDir)",
+          "group": "notes_2_file@3"
+        },
+        {
+          "command": "notes.revealInExplorer",
+          "when": "view == notesView && (viewItem =~ /noteFile/ || viewItem == noteDir)",
+          "group": "notes_3_nav@1"
+        },
+        {
+          "command": "notes.copyPath",
+          "when": "view == notesView && (viewItem =~ /noteFile/ || viewItem == noteDir)",
+          "group": "notes_3_nav@2"
+        },
+        {
+          "command": "notes.viewDiff",
+          "when": "view == notesView && viewItem == noteFileModified && notes.jjEnabled",
+          "group": "notes_4_vcs@1"
         }
       ]
     },
