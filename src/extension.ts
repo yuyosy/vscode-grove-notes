@@ -18,7 +18,12 @@ import { openGitignore } from './commands/open-gitignore';
 import { renameItem } from './commands/rename-item';
 import { maybeInitJj, selectNotesFolder, setupNotes } from './commands/setup';
 import { viewDiff } from './commands/view-diff';
-import { getAutoCommitInterval, getNotePath, getUseJujutsu } from './config';
+import {
+  getAutoCommitInterval,
+  getNotePath,
+  getPreviewOpenToSide,
+  getUseJujutsu,
+} from './config';
 import { NotesTreeProvider } from './notes-tree-provider';
 import {
   JJ_PARENT_SCHEME,
@@ -148,6 +153,19 @@ export function activate(context: vscode.ExtensionContext) {
         const normalized =
           sep === '/' ? fp.replace(/\\/g, '/') : fp.replace(/\//g, '\\');
         vscode.env.clipboard.writeText(normalized);
+      },
+    ),
+
+    vscode.commands.registerCommand(
+      'notes.openPreview',
+      (item: { data: { filePath?: string } }) => {
+        const fp = item?.data?.filePath;
+        if (fp) {
+          const cmd = getPreviewOpenToSide()
+            ? 'markdown.showPreviewToSide'
+            : 'markdown.showPreview';
+          vscode.commands.executeCommand(cmd, vscode.Uri.file(fp));
+        }
       },
     ),
 

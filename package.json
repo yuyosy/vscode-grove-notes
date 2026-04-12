@@ -105,6 +105,11 @@
         "icon": "$(diff)"
       },
       {
+        "command": "notes.openPreview",
+        "title": "%command.openPreview.title%",
+        "icon": "$(open-preview)"
+      },
+      {
         "command": "notes.openGitignore",
         "title": "%command.openGitignore.title%"
       }
@@ -179,9 +184,14 @@
           "group": "inline@1"
         },
         {
+          "command": "notes.openPreview",
+          "when": "view == notesView && viewItem =~ /noteFile/",
+          "group": "inline@2"
+        },
+        {
           "command": "notes.viewDiff",
           "when": "view == notesView && viewItem == noteFileModified && notes.jjEnabled",
-          "group": "inline@2"
+          "group": "inline@3"
         },
         {
           "command": "notes.renameItem",
@@ -277,6 +287,11 @@
           "type": "boolean",
           "default": true,
           "description": "%config.tags.scanWorkspace.description%"
+        },
+        "notes.preview.openToSide": {
+          "type": "boolean",
+          "default": false,
+          "description": "%config.preview.openToSide.description%"
         },
         "notes.versionControl.autoCommitInterval": {
           "type": "number",

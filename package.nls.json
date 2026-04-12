@@ -21,6 +21,7 @@
   "command.revealInExplorer.title": "Reveal in File Explorer",
   "command.copyPath.title": "Copy Path",
   "command.viewDiff.title": "View Changes (Diff)",
+  "command.openPreview.title": "Open Markdown Preview",
   "command.openGitignore.title": "Notes: Open .gitignore",
 
   "viewsContainer.notes.title": "Notes",
@@ -37,6 +38,7 @@
   "config.counterStartsAtOne.description": "When true, duplicate file counters start at 1 (e.g. {{N}}\u2192_1, _2\u2026 or name_1, _2\u2026). When false (default), the first file has no counter and conflicts begin at _2.",
   "config.tags.predefined.description": "Predefined tag list shown in the Edit Tags quick picker. Tags not in this list can still be typed manually.",
   "config.tags.scanWorkspace.description": "When enabled, Edit Tags also scans all notes in the workspace and adds any discovered tags to the picker candidates. Disable for large note collections to avoid performance impact.",
+  "config.preview.openToSide.description": "When enabled, the Markdown preview opens to the side (split view). When disabled, it opens in the current editor column.\n\nNote: VS Code's built-in Markdown preview reuses a single tab per editor group regardless of this setting. To keep multiple previews open simultaneously, pin the preview tab (right-click the tab → Pin).",
   "config.versionControl.autoCommitInterval.description": "Auto-commit interval in minutes using Jujutsu. Set to 0 to disable.",
   "config.versionControl.autoCommitMessage.description": "Commit message for auto-commits. Supports date tokens.",
   "config.versionControl.useJujutsu.description": "Enable Jujutsu (jj) version control features. When false, all jj commands and toolbar buttons are hidden.\n\nJujutsu is a Git-compatible version control system. [Learn more](https://www.jj-vcs.dev/latest/) about Jujutsu.",

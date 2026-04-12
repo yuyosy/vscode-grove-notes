@@ -54,6 +54,11 @@ export function getScanWorkspaceTags(): boolean {
   return getConfig().get<boolean>('tags.scanWorkspace', false);
 }
 
+/** When true, Markdown preview opens to the side; when false, opens in the current column. */
+export function getPreviewOpenToSide(): boolean {
+  return getConfig().get<boolean>('preview.openToSide', false);
+}
+
 /** When false, all Jujutsu/jj features are disabled. */
 export function getUseJujutsu(): boolean {
   return getConfig().get<boolean>('versionControl.useJujutsu', true);
