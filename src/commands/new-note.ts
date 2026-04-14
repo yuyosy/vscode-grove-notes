@@ -8,6 +8,7 @@ import {
   getNotePath,
   getTemplatePath,
 } from '../config';
+import { Commands as Cmd } from '../contributions/commands';
 import {
   buildBaseFileName,
   loadTemplates,
@@ -23,7 +24,7 @@ export async function newNote(folderPath?: string): Promise<void> {
       'Setup Now',
     );
     if (choice === 'Setup Now') {
-      await vscode.commands.executeCommand('notes.setup');
+      await vscode.commands.executeCommand(Cmd.Setup);
     }
     return;
   }
@@ -67,7 +68,7 @@ export async function newNote(folderPath?: string): Promise<void> {
   const title = titleInput.trim() || 'untitled';
 
   // 3. Build base file name
-  //    Priority: template filename pattern > notes.defaultNoteTitle config
+  //    Priority: template filename pattern > defaultNoteTitle config
   const format = templateNamePattern ?? getDefaultNoteTitle();
   const ext = getDefaultExtension();
   const baseName = buildBaseFileName(format, title, now);
@@ -82,7 +83,7 @@ export async function newNote(folderPath?: string): Promise<void> {
   // 4. Resolve unique path
   //    - {{N}} / {{N:00}} in the pattern → replaced with counter
   //    - No {{N}} but collision → appends _N
-  //    Counter start: 1 or 2 depending on notes.counterStartsAtOne setting
+  //    Counter start: 1 or 2 depending on counterStartsAtOne setting
   const filePath = resolveUniqueFilePath(
     targetDir,
     cleanBase,
@@ -108,5 +109,5 @@ export async function newNote(folderPath?: string): Promise<void> {
     editor.selection = new vscode.Selection(pos, pos);
   }
 
-  vscode.commands.executeCommand('notes.refresh');
+  vscode.commands.executeCommand(Cmd.Refresh);
 }

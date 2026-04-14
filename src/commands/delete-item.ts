@@ -1,6 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
+import { Commands as Cmd } from '../contributions/commands';
 
 export async function deleteItem(filePath: string): Promise<void> {
   if (!filePath) return;
@@ -29,7 +30,7 @@ export async function deleteItem(filePath: string): Promise<void> {
     } else {
       fs.unlinkSync(filePath);
     }
-    vscode.commands.executeCommand('notes.refresh');
+    vscode.commands.executeCommand(Cmd.Refresh);
   } catch (err: unknown) {
     vscode.window.showErrorMessage(
       `Failed to delete "${label}": ${(err as Error).message}`,

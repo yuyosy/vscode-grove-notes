@@ -16,8 +16,8 @@ import { buildTagIndex } from './list-tags';
  *
  * Tag candidates are merged from two (or three) sources:
  * 1. Tags already set in this file's front matter — always shown and pre-selected
- * 2. `notes.tags.predefined` setting entries
- * 3. Tags used anywhere in the workspace (only when `notes.tags.scanWorkspace` is enabled)
+ * 2. `tags.predefined` setting entries
+ * 3. Tags used anywhere in the workspace (only when `tags.scanWorkspace` is enabled)
  *
  * Typing a name that is not in the list and pressing Enter adds it as a new tag.
  */

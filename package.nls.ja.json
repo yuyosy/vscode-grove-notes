@@ -26,7 +26,7 @@
 
   "viewsContainer.notes.title": "Notes",
   "view.notes.name": "Notes",
-  "viewsWelcome.notesView.contents": "$(notebook) Notes\n\nノートフォルダーがまだ設定されていません。\nフォルダーを選んで Markdown ノートを管理しましょう。\n\n[$(folder-opened) ノートフォルダーを選択](command:notes.selectNotesFolder)\n\nまたはコマンドパレット（Ctrl+Shift+P）で `Notes: Setup Notes Folder` を実行してください。\n\nパスを直接入力したい場合は $(settings-gear) [設定を開く](command:workbench.action.openSettings?%5B%22notes.notePath%22%5D) から指定できます。\n\nテンプレートパス・ノートタイトルの形式・除外パターン・タグ・Jujutsu 連携など、さまざまな設定が用意されています。\n\n$(settings-gear) [拡張機能の設定を開く](command:workbench.action.openSettings?%5B%22notes%22%5D)",
+  "viewsWelcome.notesView.contents": "$(notebook) Notes\n\nノートフォルダーがまだ設定されていません。\nフォルダーを選んで Markdown ノートを管理しましょう。\n\n[$(folder-opened) ノートフォルダーを選択](command:grove-notes.selectNotesFolder)\n\nまたはコマンドパレット（Ctrl+Shift+P）で `Notes: Setup Notes Folder` を実行してください。\n\nパスを直接入力したい場合は $(settings-gear) [設定を開く](command:workbench.action.openSettings?%5B%22grove-notes.notePath%22%5D) から指定できます。\n\nテンプレートパス・ノートタイトルの形式・除外パターン・タグ・Jujutsu 連携など、さまざまな設定が用意されています。\n\n$(settings-gear) [拡張機能の設定を開く](command:workbench.action.openSettings?%5B%22grove-notes%22%5D)",
 
   "config.title": "Notes",
   "config.notePath.description": "ノートを保存するフォルダーのパスを指定します",
@@ -34,7 +34,7 @@
   "config.defaultNoteTitle.description": "新規ノートのファイル名パターンです。{{YYYY}}・{{MM}}・{{DD}}・{{HH}}・{{mm}}・{{ss}}・{{title}} が使えます。",
   "config.defaultExtension.description": "新規ノートのファイル拡張子（デフォルト: md）",
   "config.view.hiddenPatterns.description": "ツリー表示からは隠しますが、タグスキャンや最近のノート一覧には含めるフォルダー/ファイル名のパターン。グロブ記法が使えます（例: `_*`、`*.draft`）。",
-  "config.view.useGitignore.description": "オンにすると、ノートフォルダーの `.gitignore` に書かれたパターンをすべてのスキャン（タグ・最近のノート・ツリー表示）に適用します。`.git` と `.jj` はこの設定に関わらず常に除外されます。\n\n否定パターン（`!`）は無視されます。`src/**/*.tmp` のようなパスパターンにも対応しています。\n\n[.gitignore を開く](command:notes.openGitignore)",
+  "config.view.useGitignore.description": "オンにすると、ノートフォルダーの `.gitignore` に書かれたパターンをすべてのスキャン（タグ・最近のノート・ツリー表示）に適用します。`.git` と `.jj` はこの設定に関わらず常に除外されます。\n\n否定パターン（`!`）は無視されます。`src/**/*.tmp` のようなパスパターンにも対応しています。\n\n[.gitignore を開く](command:grove-notes.openGitignore)",
   "config.counterStartsAtOne.description": "同名ファイルが重複したときの連番の開始値を変更します。true にすると _1 から始まり、false（デフォルト）では最初のファイルに番号が付かず、2件目から _2 になります。",
   "config.tags.predefined.description": "タグ編集ピッカーに最初から表示しておくタグの一覧です。ここにないタグも直接入力して追加できます。",
   "config.tags.scanWorkspace.description": "オンにすると、タグ編集時にノートフォルダー内の全ファイルをスキャンして使用済みタグを候補に追加します。ノート数が多い場合はオフにすることをおすすめします。",

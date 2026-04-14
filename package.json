@@ -7,7 +7,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yuyosy/vscode-grovenotes.git"
+    "url": "https://github.com/yuyosy/vscode-grove-notes.git"
   },
   "engines": {
     "vscode": "^1.86.0"
@@ -35,99 +35,99 @@
   "contributes": {
     "commands": [
       {
-        "command": "notes.setup",
+        "command": "grove-notes.setup",
         "title": "%command.setup.title%"
       },
       {
-        "command": "notes.newNote",
+        "command": "grove-notes.newNote",
         "title": "%command.newNote.title%",
         "icon": "$(add)"
       },
       {
-        "command": "notes.listNotes",
+        "command": "grove-notes.listNotes",
         "title": "%command.listNotes.title%"
       },
       {
-        "command": "notes.listTags",
+        "command": "grove-notes.listTags",
         "title": "%command.listTags.title%"
       },
       {
-        "command": "notes.refresh",
+        "command": "grove-notes.refresh",
         "title": "%command.refresh.title%",
         "icon": "$(refresh)"
       },
       {
-        "command": "notes.jjDescribe",
+        "command": "grove-notes.jjDescribe",
         "title": "%command.jjDescribe.title%",
         "icon": "$(git-commit)"
       },
       {
-        "command": "notes.jjNew",
+        "command": "grove-notes.jjNew",
         "title": "%command.jjNew.title%",
         "icon": "$(git-branch)"
       },
       {
-        "command": "notes.jjUndo",
+        "command": "grove-notes.jjUndo",
         "title": "%command.jjUndo.title%",
         "icon": "$(discard)"
       },
       {
-        "command": "notes.jjRedo",
+        "command": "grove-notes.jjRedo",
         "title": "%command.jjRedo.title%",
         "icon": "$(redo)"
       },
       {
-        "command": "notes.jjPush",
+        "command": "grove-notes.jjPush",
         "title": "%command.jjPush.title%"
       },
       {
-        "command": "notes.jjFetch",
+        "command": "grove-notes.jjFetch",
         "title": "%command.jjFetch.title%"
       },
       {
-        "command": "notes.selectNotesFolder",
+        "command": "grove-notes.selectNotesFolder",
         "title": "%command.selectNotesFolder.title%"
       },
       {
-        "command": "notes.editTags",
+        "command": "grove-notes.editTags",
         "title": "%command.editTags.title%",
         "icon": "$(tag)"
       },
       {
-        "command": "notes.renameItem",
+        "command": "grove-notes.renameItem",
         "title": "%command.renameItem.title%",
         "icon": "$(edit)"
       },
       {
-        "command": "notes.deleteItem",
+        "command": "grove-notes.deleteItem",
         "title": "%command.deleteItem.title%",
         "icon": "$(trash)"
       },
       {
-        "command": "notes.newNoteInFolder",
+        "command": "grove-notes.newNoteInFolder",
         "title": "%command.newNoteInFolder.title%",
         "icon": "$(add)"
       },
       {
-        "command": "notes.revealInExplorer",
+        "command": "grove-notes.revealInExplorer",
         "title": "%command.revealInExplorer.title%"
       },
       {
-        "command": "notes.copyPath",
+        "command": "grove-notes.copyPath",
         "title": "%command.copyPath.title%"
       },
       {
-        "command": "notes.viewDiff",
+        "command": "grove-notes.viewDiff",
         "title": "%command.viewDiff.title%",
         "icon": "$(diff)"
       },
       {
-        "command": "notes.openPreview",
+        "command": "grove-notes.openPreview",
         "title": "%command.openPreview.title%",
         "icon": "$(open-preview)"
       },
       {
-        "command": "notes.openGitignore",
+        "command": "grove-notes.openGitignore",
         "title": "%command.openGitignore.title%"
       }
     ],
@@ -153,91 +153,91 @@
       {
         "view": "notesView",
         "contents": "%viewsWelcome.notesView.contents%",
-        "when": "!notes.notesPathConfigured"
+        "when": "!grove-notes.notesPathConfigured"
       }
     ],
     "menus": {
       "view/title": [
         {
-          "command": "notes.newNote",
+          "command": "grove-notes.newNote",
           "when": "view == notesView",
           "group": "navigation@1"
         },
         {
-          "command": "notes.jjDescribe",
-          "when": "view == notesView && notes.jjEnabled",
+          "command": "grove-notes.jjDescribe",
+          "when": "view == notesView && grove-notes.jjEnabled",
           "group": "navigation@2"
         },
         {
-          "command": "notes.jjNew",
-          "when": "view == notesView && notes.jjEnabled",
+          "command": "grove-notes.jjNew",
+          "when": "view == notesView && grove-notes.jjEnabled",
           "group": "navigation@3"
         },
         {
-          "command": "notes.refresh",
+          "command": "grove-notes.refresh",
           "when": "view == notesView",
           "group": "navigation@4"
         },
         {
-          "command": "notes.jjUndo",
-          "when": "view == notesView && notes.jjEnabled",
+          "command": "grove-notes.jjUndo",
+          "when": "view == notesView && grove-notes.jjEnabled",
           "group": "1_vcs@3"
         },
         {
-          "command": "notes.jjRedo",
-          "when": "view == notesView && notes.jjEnabled",
+          "command": "grove-notes.jjRedo",
+          "when": "view == notesView && grove-notes.jjEnabled",
           "group": "1_vcs@4"
         }
       ],
       "view/item/context": [
         {
-          "command": "notes.editTags",
+          "command": "grove-notes.editTags",
           "when": "view == notesView && viewItem =~ /noteFile/",
           "group": "notes_1_tags@1"
         },
         {
-          "command": "notes.editTags",
+          "command": "grove-notes.editTags",
           "when": "view == notesView && viewItem =~ /noteFile/",
           "group": "inline@1"
         },
         {
-          "command": "notes.openPreview",
+          "command": "grove-notes.openPreview",
           "when": "view == notesView && viewItem =~ /noteFile/",
           "group": "inline@2"
         },
         {
-          "command": "notes.viewDiff",
-          "when": "view == notesView && viewItem == noteFileModified && notes.jjEnabled",
+          "command": "grove-notes.viewDiff",
+          "when": "view == notesView && viewItem == noteFileModified && grove-notes.jjEnabled",
           "group": "inline@3"
         },
         {
-          "command": "notes.renameItem",
+          "command": "grove-notes.renameItem",
           "when": "view == notesView && (viewItem =~ /noteFile/ || viewItem == noteDir)",
           "group": "notes_2_file@1"
         },
         {
-          "command": "notes.newNoteInFolder",
+          "command": "grove-notes.newNoteInFolder",
           "when": "view == notesView && viewItem == noteDir",
           "group": "notes_2_file@2"
         },
         {
-          "command": "notes.deleteItem",
+          "command": "grove-notes.deleteItem",
           "when": "view == notesView && (viewItem =~ /noteFile/ || viewItem == noteDir)",
           "group": "notes_2_file@3"
         },
         {
-          "command": "notes.revealInExplorer",
+          "command": "grove-notes.revealInExplorer",
           "when": "view == notesView && (viewItem =~ /noteFile/ || viewItem == noteDir)",
           "group": "notes_3_nav@1"
         },
         {
-          "command": "notes.copyPath",
+          "command": "grove-notes.copyPath",
           "when": "view == notesView && (viewItem =~ /noteFile/ || viewItem == noteDir)",
           "group": "notes_3_nav@2"
         },
         {
-          "command": "notes.viewDiff",
-          "when": "view == notesView && viewItem == noteFileModified && notes.jjEnabled",
+          "command": "grove-notes.viewDiff",
+          "when": "view == notesView && viewItem == noteFileModified && grove-notes.jjEnabled",
           "group": "notes_4_vcs@1"
         }
       ]
@@ -246,27 +246,27 @@
       "title": "%config.title%",
       "id": "stable",
       "properties": {
-        "notes.notePath": {
+        "grove-notes.notePath": {
           "type": "string",
           "default": "",
           "description": "%config.notePath.description%"
         },
-        "notes.templatePath": {
+        "grove-notes.templatePath": {
           "type": "string",
           "default": "",
           "description": "%config.templatePath.description%"
         },
-        "notes.defaultNoteTitle": {
+        "grove-notes.defaultNoteTitle": {
           "type": "string",
           "default": "{{title}}_{{YYYY-MM-DD}}",
           "description": "%config.defaultNoteTitle.description%"
         },
-        "notes.defaultExtension": {
+        "grove-notes.defaultExtension": {
           "type": "string",
           "default": "md",
           "description": "%config.defaultExtension.description%"
         },
-        "notes.view.hiddenPatterns": {
+        "grove-notes.view.hiddenPatterns": {
           "type": "array",
           "items": {
             "type": "string"
@@ -277,17 +277,17 @@
           ],
           "description": "%config.view.hiddenPatterns.description%"
         },
-        "notes.view.useGitignore": {
+        "grove-notes.view.useGitignore": {
           "type": "boolean",
           "default": true,
           "markdownDescription": "%config.view.useGitignore.description%"
         },
-        "notes.counterStartsAtOne": {
+        "grove-notes.counterStartsAtOne": {
           "type": "boolean",
           "default": false,
           "description": "%config.counterStartsAtOne.description%"
         },
-        "notes.tags.predefined": {
+        "grove-notes.tags.predefined": {
           "type": "array",
           "items": {
             "type": "string"
@@ -300,33 +300,33 @@
           ],
           "description": "%config.tags.predefined.description%"
         },
-        "notes.tags.scanWorkspace": {
+        "grove-notes.tags.scanWorkspace": {
           "type": "boolean",
           "default": true,
           "description": "%config.tags.scanWorkspace.description%"
         },
-        "notes.preview.openToSide": {
+        "grove-notes.preview.openToSide": {
           "type": "boolean",
           "default": false,
           "description": "%config.preview.openToSide.description%"
         },
-        "notes.versionControl.autoCommitInterval": {
+        "grove-notes.versionControl.autoCommitInterval": {
           "type": "number",
           "default": 0,
           "minimum": 0,
           "description": "%config.versionControl.autoCommitInterval.description%"
         },
-        "notes.versionControl.autoCommitMessage": {
+        "grove-notes.versionControl.autoCommitMessage": {
           "type": "string",
           "default": "auto: {{YYYY-MM-DD HH:mm}}",
           "description": "%config.versionControl.autoCommitMessage.description%"
         },
-        "notes.versionControl.useJujutsu": {
+        "grove-notes.versionControl.useJujutsu": {
           "type": "boolean",
           "default": true,
           "markdownDescription": "%config.versionControl.useJujutsu.description%"
         },
-        "notes.versionControl.jjInitMode": {
+        "grove-notes.versionControl.jjInitMode": {
           "type": "string",
           "enum": [
             "never",

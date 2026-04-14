@@ -1,6 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
+import { Commands } from '../contributions/commands';
 
 /**
  * Renames a file or directory inside the notes folder.
@@ -48,5 +49,5 @@ export async function renameItem(itemPath: string): Promise<void> {
     await vscode.commands.executeCommand('workbench.action.closeOtherEditors');
   }
 
-  vscode.commands.executeCommand('notes.refresh');
+  vscode.commands.executeCommand(Commands.Refresh);
 }

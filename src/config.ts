@@ -1,7 +1,7 @@
 import * as path from 'node:path';
 import * as vscode from 'vscode';
 
-const SECTION = 'notes';
+const SECTION = 'grove-notes';
 
 export function getConfig() {
   return vscode.workspace.getConfiguration(SECTION);

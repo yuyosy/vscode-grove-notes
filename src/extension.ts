@@ -24,6 +24,11 @@ import {
   getPreviewOpenToSide,
   getUseJujutsu,
 } from './config';
+import { Commands as Cmd } from './contributions/commands';
+import {
+  Configurations as Conf,
+  EXTENSION_ID,
+} from './contributions/configurations';
 import { NotesTreeProvider } from './notes-tree-provider';
 import {
   JJ_PARENT_SCHEME,
@@ -31,16 +36,16 @@ import {
 } from './utils/jj-content-provider';
 import { initJjPath, isJjAvailable, jjSource } from './utils/jj-resolver';
 
-/** Syncs the `notes.jjEnabled` context key used by `when` clauses in package.json. */
+/** Syncs the `jjEnabled` context key used by `when` clauses in package.json. */
 function setJjContext(enabled: boolean): void {
-  vscode.commands.executeCommand('setContext', 'notes.jjEnabled', enabled);
+  vscode.commands.executeCommand('setContext', Cmd.JjEnabled, enabled);
 }
 
-/** Syncs the `notes.notesPathConfigured` context key used by viewsWelcome. */
+/** Syncs the `notesPathConfigured` context key used by viewsWelcome. */
 function setNotePathContext(): void {
   vscode.commands.executeCommand(
     'setContext',
-    'notes.notesPathConfigured',
+    Cmd.NotesPathConfigured,
     !!getNotePath(),
   );
 }
@@ -83,58 +88,56 @@ export function activate(context: vscode.ExtensionContext) {
 
     vscode.window.registerTreeDataProvider('notesView', treeProvider),
 
-    vscode.commands.registerCommand('notes.setup', async () => {
+    vscode.commands.registerCommand(Cmd.Setup, async () => {
       await setupNotes();
       treeProvider.refresh();
     }),
 
-    vscode.commands.registerCommand('notes.selectNotesFolder', async () => {
+    vscode.commands.registerCommand(Cmd.SelectNotesFolder, async () => {
       await selectNotesFolder();
       treeProvider.refresh();
     }),
 
-    vscode.commands.registerCommand('notes.newNote', newNote),
+    vscode.commands.registerCommand(Cmd.NewNote, newNote),
     vscode.commands.registerCommand(
-      'notes.newNoteInFolder',
+      Cmd.NewNoteInFolder,
       (item: { data: { filePath?: string } }) =>
         newNote(item?.data?.filePath ?? undefined),
     ),
-    vscode.commands.registerCommand('notes.listNotes', listNotes),
-    vscode.commands.registerCommand('notes.listTags', listTags),
+    vscode.commands.registerCommand(Cmd.ListNotes, listNotes),
+    vscode.commands.registerCommand(Cmd.ListTags, listTags),
 
-    vscode.commands.registerCommand('notes.refresh', () =>
-      treeProvider.refresh(),
-    ),
+    vscode.commands.registerCommand(Cmd.Refresh, () => treeProvider.refresh()),
 
-    vscode.commands.registerCommand('notes.jjDescribe', jjDescribe),
-    vscode.commands.registerCommand('notes.jjNew', jjNew),
-    vscode.commands.registerCommand('notes.jjUndo', jjUndo),
-    vscode.commands.registerCommand('notes.jjRedo', jjRedo),
-    vscode.commands.registerCommand('notes.jjPush', jjPush),
-    vscode.commands.registerCommand('notes.jjFetch', jjFetch),
+    vscode.commands.registerCommand(Cmd.JjDescribe, jjDescribe),
+    vscode.commands.registerCommand(Cmd.JjNew, jjNew),
+    vscode.commands.registerCommand(Cmd.JjUndo, jjUndo),
+    vscode.commands.registerCommand(Cmd.JjRedo, jjRedo),
+    vscode.commands.registerCommand(Cmd.JjPush, jjPush),
+    vscode.commands.registerCommand(Cmd.JjFetch, jjFetch),
 
     vscode.commands.registerCommand(
-      'notes.editTags',
+      Cmd.EditTags,
       (item: { data: { filePath?: string } }) =>
         editTags(item?.data?.filePath ?? ''),
     ),
     vscode.commands.registerCommand(
-      'notes.renameItem',
+      Cmd.RenameItem,
       (item: { data: { filePath?: string } }) =>
         renameItem(item?.data?.filePath ?? ''),
     ),
     vscode.commands.registerCommand(
-      'notes.deleteItem',
+      Cmd.DeleteItem,
       (item: { data: { filePath?: string } }) =>
         deleteItem(item?.data?.filePath ?? ''),
     ),
     vscode.commands.registerCommand(
-      'notes.viewDiff',
+      Cmd.ViewDiff,
       (item: { data: { filePath?: string } }) =>
         viewDiff(item?.data?.filePath ?? ''),
     ),
     vscode.commands.registerCommand(
-      'notes.revealInExplorer',
+      Cmd.RevealInExplorer,
       (item: { data: { filePath?: string } }) => {
         const fp = item?.data?.filePath;
         if (fp) {
@@ -143,7 +146,7 @@ export function activate(context: vscode.ExtensionContext) {
       },
     ),
     vscode.commands.registerCommand(
-      'notes.copyPath',
+      Cmd.CopyPath,
       (item: { data: { filePath?: string } }) => {
         const fp = item?.data?.filePath;
         if (!fp) return;
@@ -157,7 +160,7 @@ export function activate(context: vscode.ExtensionContext) {
     ),
 
     vscode.commands.registerCommand(
-      'notes.openPreview',
+      Cmd.OpenPreview,
       (item: { data: { filePath?: string } }) => {
         const fp = item?.data?.filePath;
         if (fp) {
@@ -169,7 +172,7 @@ export function activate(context: vscode.ExtensionContext) {
       },
     ),
 
-    vscode.commands.registerCommand('notes.openGitignore', openGitignore),
+    vscode.commands.registerCommand(Cmd.OpenGitignore, openGitignore),
   );
 
   // Auto-commit timer
@@ -183,8 +186,8 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (
-        e.affectsConfiguration('notes.versionControl.useJujutsu') ||
-        e.affectsConfiguration('notes.notePath')
+        e.affectsConfiguration(Conf.VersionControlUseJujutsu) ||
+        e.affectsConfiguration(Conf.NotePath)
       ) {
         // Re-evaluate jj context key
         const nowUseJj = getUseJujutsu();
@@ -192,14 +195,14 @@ export function activate(context: vscode.ExtensionContext) {
         setJjContext(nowJjEnabled);
 
         // Check for jj init when notePath changes
-        if (nowJjEnabled && e.affectsConfiguration('notes.notePath')) {
+        if (nowJjEnabled && e.affectsConfiguration(Conf.NotePath)) {
           const notePath = getNotePath();
           if (notePath) maybeInitJj(notePath);
         }
       }
       if (
-        e.affectsConfiguration('notes.versionControl.autoCommitInterval') ||
-        e.affectsConfiguration('notes.notePath')
+        e.affectsConfiguration(Conf.VersionControlAutoCommitInterval) ||
+        e.affectsConfiguration(Conf.NotePath)
       ) {
         autoCommitDisposable?.dispose();
         autoCommitDisposable = undefined;
@@ -209,7 +212,7 @@ export function activate(context: vscode.ExtensionContext) {
           context.subscriptions.push(autoCommitDisposable);
         }
       }
-      if (e.affectsConfiguration('notes')) {
+      if (e.affectsConfiguration(EXTENSION_ID)) {
         setNotePathContext();
         treeProvider.refresh();
       }

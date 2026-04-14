@@ -5,11 +5,11 @@ import { getNotePath } from '../config';
 import { getJjPath, isJjAvailable } from './jj-resolver';
 
 /**
- * Content provider for the `notes-jj-parent` URI scheme.
+ * Content provider for the `grove-notes-jj-parent` URI scheme.
  * Returns the content of a file at the parent revision (`@-`) via `jj file show`.
  *
  * URI format: same path as `vscode.Uri.file(absolutePath)`, scheme replaced with
- * `notes-jj-parent`.  e.g.  notes-jj-parent:///z%3A/Notes/foo.md
+ * `grove-notes-jj-parent`.  e.g.  grove-notes-jj-parent:///z%3A/Notes/foo.md
  */
 export class JjParentContentProvider
   implements vscode.TextDocumentContentProvider
@@ -38,4 +38,4 @@ export class JjParentContentProvider
   }
 }
 
-export const JJ_PARENT_SCHEME = 'notes-jj-parent';
+export const JJ_PARENT_SCHEME = 'grove-notes-jj-parent';
