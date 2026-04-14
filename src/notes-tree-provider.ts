@@ -60,7 +60,15 @@ export class NotesTreeProvider
   >();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
+  private _modifiedFilesCache: Set<string> = new Set();
+
   refresh(): void {
+    // Refresh the modified-files cache once per cycle so getChildren reuses it
+    const notePath = getNotePath();
+    this._modifiedFilesCache =
+      notePath && getUseJujutsu() && isJjAvailable()
+        ? getJjModifiedFiles(notePath)
+        : new Set();
     this._onDidChangeTreeData.fire();
   }
 
@@ -80,14 +88,13 @@ export class NotesTreeProvider
     if (kind === 'rootFile') {
       const notePath = getNotePath();
       if (!notePath) return [];
-      return this._getDirChildren(notePath, this._getModifiedFiles(notePath));
+      return this._getDirChildren(notePath, this._modifiedFilesCache);
     }
 
     if (kind === 'dir' && element.data.filePath) {
-      const notePath = getNotePath();
       return this._getDirChildren(
         element.data.filePath,
-        this._getModifiedFiles(notePath ?? ''),
+        this._modifiedFilesCache,
       );
     }
 
@@ -96,9 +103,9 @@ export class NotesTreeProvider
     }
 
     if (kind === 'tag' && element.data.files) {
-      const notePath = getNotePath();
-      const modified = this._getModifiedFiles(notePath ?? '');
-      return element.data.files.map((f) => this._makeFileItem(f, modified));
+      return element.data.files.map((f) =>
+        this._makeFileItem(f, this._modifiedFilesCache),
+      );
     }
 
     return [];
@@ -115,11 +122,6 @@ export class NotesTreeProvider
         vscode.TreeItemCollapsibleState.Collapsed,
       ),
     ];
-  }
-
-  private _getModifiedFiles(notePath: string): Set<string> {
-    if (!notePath || !getUseJujutsu() || !isJjAvailable()) return new Set();
-    return getJjModifiedFiles(notePath);
   }
 
   private _getDirChildren(

@@ -34,9 +34,22 @@ export async function jjDescribe(): Promise<void> {
   const notePath = requireNotePath();
   if (!notePath) return;
 
+  // Fetch current description to prefill the input box
+  let currentDesc = '';
+  try {
+    const { stdout } = await runJj(
+      ['log', '-r', '@', '--no-graph', '-T', 'description'],
+      notePath,
+    );
+    currentDesc = stdout.trim();
+  } catch {
+    // Ignore — leave empty if unavailable
+  }
+
   const msg = await vscode.window.showInputBox({
     prompt: 'Jujutsu: Enter commit description',
     placeHolder: 'Describe your changes...',
+    value: currentDesc,
   });
   if (msg === undefined) return;
 
@@ -182,8 +195,12 @@ export function getJjModifiedFiles(notePath: string): Set<string> {
 /**
  * Starts an auto-commit timer that runs `jj describe && jj new` at the given interval.
  * Returns a Disposable that clears the timer.
+ * @param onComplete  Called after each successful commit cycle (use to refresh tree view).
  */
-export function startAutoCommit(intervalMinutes: number): vscode.Disposable {
+export function startAutoCommit(
+  intervalMinutes: number,
+  onComplete?: () => void,
+): vscode.Disposable {
   const ms = intervalMinutes * 60 * 1000;
   const timer = setInterval(async () => {
     const notePath = getNotePath();
@@ -193,6 +210,7 @@ export function startAutoCommit(intervalMinutes: number): vscode.Disposable {
     try {
       await runJj(['describe', '--message', message], notePath);
       await runJj(['new'], notePath);
+      onComplete?.();
     } catch {
       // Auto-commit failures are silent to avoid interrupting the user
     }

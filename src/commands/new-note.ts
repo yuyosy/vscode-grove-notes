@@ -43,19 +43,25 @@ export async function newNote(folderPath?: string): Promise<void> {
   if (templates.length > 0) {
     const items: vscode.QuickPickItem[] = [
       { label: '$(file-add) No template', description: 'Create an empty note' },
-      ...templates.map((t) => ({ label: t.name, description: t.filePath })),
+      ...templates.map((t) => ({
+        label: t.name,
+        description: t.subDir,
+      })),
     ];
     const selection = await vscode.window.showQuickPick(items, {
       placeHolder: 'Select a template (or press Escape to cancel)',
     });
     if (selection === undefined) return;
-    if (
-      selection.description &&
-      selection.description !== 'Create an empty note'
-    ) {
-      templateFilePath = selection.description;
-      const tpl = templates.find((t) => t.filePath === selection.description);
-      if (tpl) templateNamePattern = tpl.name;
+    if (selection.label !== '$(file-add) No template') {
+      const tpl = templates.find(
+        (t) =>
+          t.name === selection.label &&
+          (t.subDir ?? undefined) === (selection.description ?? undefined),
+      );
+      if (tpl) {
+        templateFilePath = tpl.filePath;
+        templateNamePattern = tpl.name;
+      }
     }
   }
 

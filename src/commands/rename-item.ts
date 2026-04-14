@@ -40,13 +40,21 @@ export async function renameItem(itemPath: string): Promise<void> {
     return;
   }
 
-  // If the renamed file was open in the editor, reopen it at the new path
-  const openDoc = vscode.workspace.textDocuments.find(
-    (d) => d.uri.fsPath === itemPath,
+  // If the renamed file was open in the editor, swap it to the new path
+  const editor = vscode.window.visibleTextEditors.find(
+    (e) => e.document.uri.fsPath === itemPath,
   );
-  if (openDoc) {
-    await vscode.window.showTextDocument(vscode.Uri.file(newPath));
-    await vscode.commands.executeCommand('workbench.action.closeOtherEditors');
+  if (editor) {
+    const col = editor.viewColumn;
+    // Activate the old tab so closeActiveEditor targets it
+    await vscode.window.showTextDocument(editor.document, {
+      viewColumn: col,
+      preserveFocus: false,
+    });
+    await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+    await vscode.window.showTextDocument(vscode.Uri.file(newPath), {
+      viewColumn: col,
+    });
   }
 
   vscode.commands.executeCommand(Commands.Refresh);

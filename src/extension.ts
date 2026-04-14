@@ -98,7 +98,7 @@ export function activate(context: vscode.ExtensionContext) {
       treeProvider.refresh();
     }),
 
-    vscode.commands.registerCommand(Cmd.NewNote, newNote),
+    vscode.commands.registerCommand(Cmd.NewNote, () => newNote()),
     vscode.commands.registerCommand(
       Cmd.NewNoteInFolder,
       (item: { data: { filePath?: string } }) =>
@@ -110,9 +110,18 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand(Cmd.Refresh, () => treeProvider.refresh()),
 
     vscode.commands.registerCommand(Cmd.JjDescribe, jjDescribe),
-    vscode.commands.registerCommand(Cmd.JjNew, jjNew),
-    vscode.commands.registerCommand(Cmd.JjUndo, jjUndo),
-    vscode.commands.registerCommand(Cmd.JjRedo, jjRedo),
+    vscode.commands.registerCommand(Cmd.JjNew, async () => {
+      await jjNew();
+      treeProvider.refresh();
+    }),
+    vscode.commands.registerCommand(Cmd.JjUndo, async () => {
+      await jjUndo();
+      treeProvider.refresh();
+    }),
+    vscode.commands.registerCommand(Cmd.JjRedo, async () => {
+      await jjRedo();
+      treeProvider.refresh();
+    }),
     vscode.commands.registerCommand(Cmd.JjPush, jjPush),
     vscode.commands.registerCommand(Cmd.JjFetch, jjFetch),
 
@@ -175,10 +184,39 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand(Cmd.OpenGitignore, openGitignore),
   );
 
+  // Watch notes folder for file changes so the diff inline button stays in sync
+  let fsWatcher: vscode.FileSystemWatcher | undefined;
+  const startFsWatcher = (np: string) => {
+    fsWatcher?.dispose();
+    fsWatcher = vscode.workspace.createFileSystemWatcher(
+      new vscode.RelativePattern(np, '**'),
+    );
+    const refresh = (uri: vscode.Uri) => {
+      // Ignore internal vcs metadata to avoid unnecessary refreshes
+      const fp = uri.fsPath;
+      if (
+        !fp.startsWith(path.join(np, '.jj')) &&
+        !fp.startsWith(path.join(np, '.git'))
+      ) {
+        treeProvider.refresh();
+      }
+    };
+    fsWatcher.onDidCreate(refresh, null, context.subscriptions);
+    fsWatcher.onDidChange(refresh, null, context.subscriptions);
+    fsWatcher.onDidDelete(refresh, null, context.subscriptions);
+    context.subscriptions.push(fsWatcher);
+  };
+  if (jjEnabled) {
+    const np = getNotePath();
+    if (np) startFsWatcher(np);
+  }
+
   // Auto-commit timer
   const interval = getAutoCommitInterval();
   if (interval > 0) {
-    context.subscriptions.push(startAutoCommit(interval));
+    context.subscriptions.push(
+      startAutoCommit(interval, () => treeProvider.refresh()),
+    );
   }
 
   // Re-register auto-commit when config changes
@@ -195,9 +233,15 @@ export function activate(context: vscode.ExtensionContext) {
         setJjContext(nowJjEnabled);
 
         // Check for jj init when notePath changes
-        if (nowJjEnabled && e.affectsConfiguration(Conf.NotePath)) {
+        if (e.affectsConfiguration(Conf.NotePath)) {
           const notePath = getNotePath();
-          if (notePath) maybeInitJj(notePath);
+          if (nowJjEnabled && notePath) {
+            maybeInitJj(notePath);
+            startFsWatcher(notePath);
+          } else {
+            fsWatcher?.dispose();
+            fsWatcher = undefined;
+          }
         }
       }
       if (
@@ -208,7 +252,9 @@ export function activate(context: vscode.ExtensionContext) {
         autoCommitDisposable = undefined;
         const newInterval = getAutoCommitInterval();
         if (newInterval > 0) {
-          autoCommitDisposable = startAutoCommit(newInterval);
+          autoCommitDisposable = startAutoCommit(newInterval, () =>
+            treeProvider.refresh(),
+          );
           context.subscriptions.push(autoCommitDisposable);
         }
       }

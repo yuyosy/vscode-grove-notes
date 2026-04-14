@@ -5,22 +5,37 @@ import { formatDateTokens } from './date-format';
 export interface Template {
   name: string;
   filePath: string;
+  subDir?: string;
 }
 
-/** Lists all .md template files in the given directory. */
+/** Lists all .md template files in the given directory (recursively). */
 export function loadTemplates(templateDir: string): Template[] {
   if (!fs.existsSync(templateDir)) return [];
-  try {
-    return fs
-      .readdirSync(templateDir)
-      .filter((f) => f.endsWith('.md'))
-      .map((f) => ({
-        name: path.basename(f, '.md'),
-        filePath: path.join(templateDir, f),
-      }));
-  } catch {
-    return [];
-  }
+  const results: Template[] = [];
+  const walk = (dir: string) => {
+    let entries: fs.Dirent[];
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        walk(full);
+      } else if (entry.isFile() && entry.name.endsWith('.md')) {
+        const rel = path.relative(templateDir, full);
+        const subDir = path.dirname(rel);
+        results.push({
+          name: path.basename(entry.name, '.md'),
+          filePath: full,
+          subDir: subDir === '.' ? undefined : subDir,
+        });
+      }
+    }
+  };
+  walk(templateDir);
+  return results;
 }
 
 /**
