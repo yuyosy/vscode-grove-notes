@@ -13,6 +13,7 @@ import {
   buildBaseFileName,
   loadTemplates,
   processTemplate,
+  resolveTemplateSubDir,
   resolveUniqueFilePath,
 } from '../utils/template';
 
@@ -39,6 +40,7 @@ export async function newNote(folderPath?: string): Promise<void> {
   // When a template is selected, its filename (without .md) becomes the
   // format string for the new note's file name.
   let templateNamePattern: string | undefined;
+  let templateSubDirPattern: string | undefined; // raw pattern; {{title}} resolved after input
 
   if (templates.length > 0) {
     const items: vscode.QuickPickItem[] = [
@@ -61,21 +63,45 @@ export async function newNote(folderPath?: string): Promise<void> {
       if (tpl) {
         templateFilePath = tpl.filePath;
         templateNamePattern = tpl.name;
+        templateSubDirPattern = tpl.subDir;
       }
     }
   }
 
-  // 2. Input note title — empty input is allowed and defaults to 'untitled'
-  const titleInput = await vscode.window.showInputBox({
-    prompt: 'Note title (leave empty for "untitled")',
-    placeHolder: 'My note title',
-  });
-  if (titleInput === undefined) return; // Escape pressed
-  const title = titleInput.trim() || 'untitled';
+  // 2. Input note title — skipped when neither the filename pattern, the
+  //    template folder hierarchy, nor the template content uses {{title}}.
+  const format = templateNamePattern ?? getDefaultNoteTitle();
+  const formatNeedsTitle = format.includes('{{title}}');
+  const subDirNeedsTitle = (templateSubDirPattern ?? '').includes('{{title}}');
+  const contentNeedsTitle = (() => {
+    if (!templateFilePath) return false;
+    try {
+      return fs.readFileSync(templateFilePath, 'utf8').includes('{{title}}');
+    } catch {
+      return false;
+    }
+  })();
+
+  let title = 'untitled';
+  if (formatNeedsTitle || subDirNeedsTitle || contentNeedsTitle) {
+    const titleInput = await vscode.window.showInputBox({
+      prompt: 'Note title (leave empty for "untitled")',
+      placeHolder: 'My note title',
+    });
+    if (titleInput === undefined) return; // Escape pressed
+    title = titleInput.trim() || 'untitled';
+  }
+
+  // Resolve template sub-directory now that we have the title
+  const templateSubDir = templateSubDirPattern
+    ? resolveTemplateSubDir(templateSubDirPattern, now).replace(
+        /\{\{title\}\}/g,
+        title,
+      )
+    : undefined;
 
   // 3. Build base file name
   //    Priority: template filename pattern > defaultNoteTitle config
-  const format = templateNamePattern ?? getDefaultNoteTitle();
   const ext = getDefaultExtension();
   const baseName = buildBaseFileName(format, title, now);
 
@@ -83,7 +109,10 @@ export async function newNote(folderPath?: string): Promise<void> {
   const subDir = path.dirname(baseName);
   const cleanBase = path.basename(baseName);
   // folderPath: target directory from "New Note in Folder" context menu
-  const baseDir = folderPath ?? notePath;
+  // templateSubDir: hierarchy derived from template folder name (e.g. {{YYYY}}.{{MM}}.{{DD}})
+  const baseDir = templateSubDir
+    ? path.join(folderPath ?? notePath, templateSubDir)
+    : (folderPath ?? notePath);
   const targetDir = subDir === '.' ? baseDir : path.join(baseDir, subDir);
 
   // 4. Resolve unique path
