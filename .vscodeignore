@@ -1,0 +1,35 @@
+
+# User Specified Files
+data/
+**/*.local*
+**/*.local*/**
+*.env*
+
+# Development files
+.git/**
+.jj/**
+.github/**
+.vscode/**
+node_modules/**
+build/**
+dist/**
+scripts/**
+.gitignore
+.gitattributes
+mise.toml
+
+# Temporary build artifacts
+resources/bin/*.zip
+resources/bin/temp/**
+
+# Build outputs to exclude
+**/*.map
+
+# Source files
+src/**
+tests/**
+tsconfig*.json
+biome.jsonc
+
+# README files (keep only main README)
+README.*.md

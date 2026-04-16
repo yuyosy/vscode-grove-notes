@@ -15,23 +15,6 @@ function jjBinaryName(): string {
 }
 
 /**
- * Returns the platform sub-directory name for bundled binaries.
- *   win32   → 'win32'
- *   darwin  → 'darwin'
- *   linux   → 'linux'
- */
-function platformDir(): string {
-  switch (process.platform) {
-    case 'win32':
-      return 'win32';
-    case 'darwin':
-      return 'darwin';
-    default:
-      return 'linux';
-  }
-}
-
-/**
  * Tries to find `jj` on the user's PATH using `where` (Windows) or `which` (Unix).
  * Returns the absolute path, or null if not found.
  */
@@ -55,10 +38,9 @@ function findJjInPath(): string | null {
  *
  * Resolution order:
  *   1. User's PATH (`jj` / `jj.exe`)
- *   2. Bundled binary: <extensionPath>/resources/bin/<platform>/jj[.exe]
+ *   2. Bundled binary: <extensionPath>/resources/bin/jj[.exe]
  *
- * Throws if neither is found (so the user gets a clear error at startup
- * rather than a cryptic ENOENT when running a command).
+ * The bundled binary is downloaded during build time for the target platform.
  */
 export function initJjPath(extensionPath: string): void {
   // 1. Try PATH
@@ -68,14 +50,8 @@ export function initJjPath(extensionPath: string): void {
     return;
   }
 
-  // 2. Bundled binary
-  const bundled = path.join(
-    extensionPath,
-    'resources',
-    'bin',
-    platformDir(),
-    jjBinaryName(),
-  );
+  // 2. Bundled binary (platform-specific, downloaded at build time)
+  const bundled = path.join(extensionPath, 'resources', 'bin', jjBinaryName());
   if (fs.existsSync(bundled)) {
     resolvedJjPath = bundled;
     return;
@@ -92,7 +68,7 @@ export function initJjPath(extensionPath: string): void {
 export function getJjPath(): string {
   if (!resolvedJjPath) {
     throw new Error(
-      'jj binary not found. Install jj (https://www.jj-vcs.dev/latest/) or place a bundled binary at resources/bin/<platform>/jj[.exe].',
+      'jj binary not found. Please install jj from (https://www.jj-vcs.dev/latest/)  or reinstall this extension.',
     );
   }
   return resolvedJjPath;

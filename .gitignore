@@ -6,4 +6,5 @@ node_modules/
 resources/bin/*
 
 out/
+dist/
 *.vsix
