@@ -1,11 +1,19 @@
 {
   "[javascript]": {
     "editor.defaultFormatter": "biomejs.biome",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports.biome": "explicit",
+      "source.fixAll.biome": "explicit"
+    }
   },
   "[typescript]": {
     "editor.defaultFormatter": "biomejs.biome",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports.biome": "explicit",
+      "source.fixAll.biome": "explicit"
+    }
   },
   "[json]": {
     "editor.defaultFormatter": "biomejs.biome",
@@ -15,11 +23,5 @@
     "editor.defaultFormatter": "biomejs.biome",
     "editor.formatOnSave": true
   },
-  "editor.codeActionsOnSave": {
-    "source.organizeImports": "explicit",
-    "source.fixAll": "explicit"
-  },
-  "chat.tools.terminal.autoApprove": {
-    "jj": true
-  }
+  "files.eol": "\n"
 }

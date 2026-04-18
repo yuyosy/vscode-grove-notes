@@ -1,6 +1,6 @@
-import { minimatch } from 'minimatch';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { minimatch } from 'minimatch';
 
 /**
  * VCS metadata directories that are always excluded from all scans and views,
