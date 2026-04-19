@@ -21,6 +21,7 @@ AGENTS.md
 
 # Temporary build artifacts
 resources/bin/*.zip
+resources/bin/*.tar.gz
 resources/bin/temp/**
 
 # Build outputs to exclude
