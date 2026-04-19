@@ -17,6 +17,7 @@ scripts/**
 .gitignore
 .gitattributes
 mise.toml
+AGENTS.md
 
 # Temporary build artifacts
 resources/bin/*.zip
@@ -30,6 +31,8 @@ src/**
 tests/**
 tsconfig*.json
 biome.jsonc
+rollup.config.ts
 
 # README files (keep only main README)
+images/**
 README.*.md

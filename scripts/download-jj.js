@@ -44,8 +44,26 @@ const BIN_DIR = path.join(__dirname, '..', 'resources', 'bin');
 const VERSION_FILE = path.join(BIN_DIR, 'jj.version');
 
 const getPlatformInfo = () => {
-  const platform = process.platform;
-  const arch = process.arch;
+  // Use TARGET_PLATFORM environment variable if set, otherwise auto-detect
+  const targetPlatform = process.env.TARGET_PLATFORM;
+
+  let platform, arch;
+  if (targetPlatform) {
+    // Parse target platform (e.g., "win32-x64" -> platform: "win32", arch: "x64")
+    const parts = targetPlatform.split('-');
+    if (parts.length !== 2) {
+      throw new Error(
+        `Invalid TARGET_PLATFORM format: ${targetPlatform}. Expected format: <platform>-<arch>`,
+      );
+    }
+    [platform, arch] = parts;
+    console.log(`Using target platform from environment: ${platform}-${arch}`);
+  } else {
+    // Auto-detect from current environment
+    platform = process.platform;
+    arch = process.arch;
+    console.log(`Auto-detected platform: ${platform}-${arch}`);
+  }
 
   const target = JJ_PLATFORM_MAP[`${platform}-${arch}`];
   if (!target) {
@@ -53,7 +71,7 @@ const getPlatformInfo = () => {
   }
 
   const url = `https://github.com/jj-vcs/jj/releases/download/${JJ_VERSION}/jj-${JJ_VERSION}-${target}.zip`;
-  const binaryName = process.platform === 'win32' ? 'jj.exe' : 'jj';
+  const binaryName = platform === 'win32' ? 'jj.exe' : 'jj';
 
   return { url, binaryName };
 };
@@ -101,13 +119,21 @@ const extractBinary = (archivePath, binaryName, outputPath) => {
 
   try {
     if (archivePath.endsWith('.zip')) {
-      // Windows: use PowerShell to extract
-      const archivePathEscaped = archivePath.replace(/'/g, "''");
-      const tempDirEscaped = tempDir.replace(/'/g, "''");
-      execSync(
-        `powershell -Command "Expand-Archive -Path '${archivePathEscaped}' -DestinationPath '${tempDirEscaped}' -Force"`,
-        { stdio: 'inherit' },
-      );
+      // Extract ZIP file using platform-appropriate command
+      if (process.platform === 'win32') {
+        // Windows: use PowerShell
+        const archivePathEscaped = archivePath.replace(/'/g, "''");
+        const tempDirEscaped = tempDir.replace(/'/g, "''");
+        execSync(
+          `powershell -Command "Expand-Archive -Path '${archivePathEscaped}' -DestinationPath '${tempDirEscaped}' -Force"`,
+          { stdio: 'inherit' },
+        );
+      } else {
+        // Unix: use unzip command
+        execSync(`unzip -o "${archivePath}" -d "${tempDir}"`, {
+          stdio: 'inherit',
+        });
+      }
     } else if (archivePath.endsWith('.tar.gz')) {
       // Unix: use tar
       execSync(`tar -xzf "${archivePath}" -C "${tempDir}"`, {
@@ -130,9 +156,9 @@ const extractBinary = (archivePath, binaryName, outputPath) => {
 
     console.log(`Binary installed to ${outputPath}`);
   } finally {
-    // Clean up
+    // Clean up temp directory only (keep archive for cache)
     fs.rmSync(tempDir, { recursive: true, force: true });
-    fs.unlinkSync(archivePath);
+    console.log(`Archive cached at ${archivePath}`);
   }
 };
 
@@ -195,12 +221,18 @@ const main = async () => {
   const archivePath = path.join(BIN_DIR, archiveName);
 
   try {
-    await downloadFile(url, archivePath);
+    // Check if archive already exists (cached from previous download)
+    if (fs.existsSync(archivePath)) {
+      console.log(`Using cached archive: ${archivePath}`);
+    } else {
+      await downloadFile(url, archivePath);
+    }
+
     extractBinary(archivePath, binaryName, outputPath);
     saveCachedVersion();
-    console.log('Completed downloading and extracting jj archive.');
+    console.log('Completed extracting jj binary.');
   } catch (error) {
-    console.error('Failed to download jj binary:', error.message);
+    console.error('Failed to process jj binary:', error.message);
     process.exit(1);
   }
 };

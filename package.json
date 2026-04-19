@@ -350,23 +350,29 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run clean-jj && npm run download-jj && npm run compile",
-    "compile": "tsc -p ./",
+    "vscode:prepublish": "npm run clean-out && npm run compile && npm run ensure-dist",
+    "compile": "rollup --config rollup.config.ts --configPlugin esbuild",
     "watch": "tsc -watch -p ./",
     "lint": "biome check src",
     "download-jj": "node scripts/download-jj.js",
     "clean-jj": "node scripts/clear-jj.js",
-    "package": "vsce package --out dist",
-    "package:win32": "vsce package --target win32-x64 --out dist",
-    "package:darwin-x64": "vsce package --target darwin-x64 --out dist",
-    "package:darwin-arm64": "vsce package --target darwin-arm64 --out dist",
-    "package:linux": "vsce package --target linux-x64 --out dist",
+    "clean-out": "node scripts/clean-out.js",
+    "ensure-dist": "node scripts/ensure-dist.js",
+    "package": "vsce package --out dist/",
+    "package:win32": "vsce package --target win32-x64 --out dist/",
+    "package:darwin-x64": "vsce package --target darwin-x64 --out dist/",
+    "package:darwin-arm64": "vsce package --target darwin-arm64 --out dist/",
+    "package:linux": "vsce package --target linux-x64 --out dist/",
     "package:all": "npm run package:win32 && npm run package:darwin-x64 && npm run package:darwin-arm64 && npm run package:linux"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.10",
+    "@rollup/plugin-commonjs": "^29.0.2",
+    "@rollup/plugin-node-resolve": "^16.0.3",
     "@types/node": "^25.5.2",
     "@types/vscode": "^1.86.0",
+    "rollup": "^4.60.2",
+    "rollup-plugin-esbuild": "^6.2.1",
     "typescript": "^6.0.2"
   },
   "dependencies": {

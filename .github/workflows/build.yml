@@ -7,19 +7,15 @@ on:
 jobs:
   build:
     name: Build ${{ matrix.target }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - target: win32-x64
-            os: windows-latest
-          - target: darwin-x64
-            os: macos-13
-          - target: darwin-arm64
-            os: macos-latest
-          - target: linux-x64
-            os: ubuntu-latest
+        target:
+          - win32-x64
+          - darwin-x64
+          - darwin-arm64
+          - linux-x64
 
     steps:
       - name: Checkout repository
@@ -34,12 +30,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Download JJ binary
+      - name: Download JJ binary for ${{ matrix.target }}
         run: npm run download-jj
         env:
+          TARGET_PLATFORM: ${{ matrix.target }}
           JJ_VERSION: ${{ github.event.inputs.jj_version || '' }}
 
-      - name: Package Extension
+      - name: Package Extension for ${{ matrix.target }}
         run: npm run package:${{ matrix.target }}
 
       - name: Upload VSIX artifact
