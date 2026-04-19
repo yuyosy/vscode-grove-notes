@@ -1,5 +1,5 @@
 <h1 align="center">
-  <a href="https://github.com/yuyosy/vscode-grovenotes" target="_blank">
+  <a href="https://github.com/yuyosy/vscode-grove-notes" target="_blank">
     <img src="resources/icon/product-icon.png" alt="GroveNotes Logo" width="200px">
   </a><br>
     GroveNotes – Notes Tree View
@@ -22,8 +22,8 @@ GroveNotes is a Visual Studio Code extension that helps you organize and manage 
 
 The extension is available on the Visual Studio Code Marketplace and Open VSX Registry.
 
-- [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=yuyosy.grove-notes)
-- [Open VSX Registry](https://open-vsx.org/extension/yuyosy/grove-notes)
+- [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=yuyosy.vscode-grove-notes)
+- [Open VSX Registry](https://open-vsx.org/extension/yuyosy/vscode-grove-notes)
 
 ## Bundled Dependencies
 
