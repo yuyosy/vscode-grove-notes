@@ -22,8 +22,21 @@ GroveNotes is a Visual Studio Code extension that helps you organize and manage 
 
 The extension is available on the Visual Studio Code Marketplace and Open VSX Registry.
 
-- [TODO: VSC Marketplace link](https://marketplace.visualstudio.com/)
-- [TODO: Open VSX Registry link](https://open-vsx.org/extension/)
+- [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=yuyosy.grove-notes)
+- [Open VSX Registry](https://open-vsx.org/extension/yuyosy/grove-notes)
+
+## Bundled Dependencies
+
+This extension includes the following bundled binaries:
+
+- **[Jujutsu (jj)](https://github.com/jj-vcs/jj)** - Version control system
+  - License: Apache License 2.0
+  - Used for version control features when enabled
+  - The extension will use your system's `jj` installation if available, falling back to the bundled version
+
+If you prefer to use your own installation of `jj`, you can install it from:
+- Official website: https://www.jj-vcs.dev/latest/
+- GitHub releases: https://github.com/jj-vcs/jj/releases
 
 ## Usage / Screenshots
 
@@ -62,11 +75,11 @@ Tokens can be combined freely inside a single `{{ }}`:
 
 Used to auto-number files when duplicates exist.
 
-| Token | Output example | Description |
+| Token | Description | Output example |
 |---|---|---|
-| `{{N}}` | `1`, `2`, `3`… | No padding |
-| `{{0N}}` | `01`, `02`… | 2-digit zero-padded |
-| `{{00N}}` | `001`, `002`… | 3-digit zero-padded |
+| `{{N}}` | No padding | `1`, `2`, `3`… |
+| `{{0N}}` | 2-digit zero-padded | `01`, `02`… |
+| `{{00N}}` | 3-digit zero-padded | `001`, `002`… |
 
 > Add more leading zeros to increase the output width: `{{000N}}` → `0001`, `0002`…
 
@@ -77,7 +90,7 @@ Used to auto-number files when duplicates exist.
 The folder containing a template can define a target sub-directory for the created note.  
 Within the folder name, `.` is treated as a path separator:
 
-| Template folder | Created under (2026-04-15) |
+| Template folder | Example (2026-04-15) |
 |---|---|
 | `{{YYYY}}.{{YYYY-MM}}.{{YYYY-MM-DD}}` | `notes/2026/2026-04/2026-04-15/` |
 | `{{YYYY}}.{{MM}}` | `notes/2026/04/` |
@@ -91,7 +104,7 @@ v1{{.}}0  →  notes/v1.0/
 
 When templates are stored in nested sub-folders inside the templates directory, that folder hierarchy is preserved as-is and combined with the `.` expansion:
 
-| Templates directory structure | Created under (2026-04-15) |
+| Templates directory structure | Example (2026-04-15) |
 |---|---|
 | `.templates/diary/{{YYYY}}.{{MM}}/` | `notes/diary/2026/04/` |
 | `.templates/work/{{YYYY}}.{{MM}}.{{DD}}/` | `notes/work/2026/04/15/` |
@@ -101,7 +114,7 @@ When templates are stored in nested sub-folders inside the templates directory, 
 
 If you'd like to contribute to GroveNotes, please fork the repository and submit a pull request. Contributions of all kinds are welcome, including bug fixes, new features, documentation improvements, and more.
 
-- [TODO: GitHub Repository link](https://github.com/yuyosy/vscode-grovenotes)
+- [GitHub - yuyosy/vscode-grove-notes](https://github.com/yuyosy/vscode-grove-notes)
 
 ## Behind the Name
 
