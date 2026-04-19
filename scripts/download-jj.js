@@ -70,7 +70,8 @@ const getPlatformInfo = () => {
     throw new Error(`Unsupported platform/architecture: ${platform}-${arch}`);
   }
 
-  const url = `https://github.com/jj-vcs/jj/releases/download/${JJ_VERSION}/jj-${JJ_VERSION}-${target}.zip`;
+  const ext = platform === 'win32' ? 'zip' : 'tar.gz';
+  const url = `https://github.com/jj-vcs/jj/releases/download/${JJ_VERSION}/jj-${JJ_VERSION}-${target}.${ext}`;
   const binaryName = platform === 'win32' ? 'jj.exe' : 'jj';
 
   return { url, binaryName };
