@@ -52,10 +52,12 @@ jobs:
       - name: Publish to VS Code Marketplace
         run: |
           if [[ "${{ steps.check_prerelease.outputs.is_prerelease }}" == "true" ]]; then
-            npx vsce publish --packagePath dist/*.vsix --pat ${{ secrets.VSCE_PAT }} --pre-release
+            npm run publish:vsce:pre-release
           else
-            npx vsce publish --packagePath dist/*.vsix --pat ${{ secrets.VSCE_PAT }}
+            npm run publish:vsce
           fi
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
         timeout-minutes: 5
 
   publish-openvsx:
@@ -100,8 +102,10 @@ jobs:
       - name: Publish to Open VSX Registry
         run: |
           if [[ "${{ steps.check_prerelease.outputs.is_prerelease }}" == "true" ]]; then
-            npx ovsx publish dist/*.vsix --pat ${{ secrets.OPENVSX_TOKEN }} --pre-release
+            npm run publish:ovsx:pre-release
           else
-            npx ovsx publish dist/*.vsix --pat ${{ secrets.OPENVSX_TOKEN }}
+            npm run publish:ovsx
           fi
+        env:
+          OVSX_PAT: ${{ secrets.OPENVSX_TOKEN }}
         timeout-minutes: 5

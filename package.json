@@ -363,7 +363,11 @@
     "package:darwin-x64": "vsce package --target darwin-x64 --out dist/",
     "package:darwin-arm64": "vsce package --target darwin-arm64 --out dist/",
     "package:linux": "vsce package --target linux-x64 --out dist/",
-    "package:all": "npm run package:win32 && npm run package:darwin-x64 && npm run package:darwin-arm64 && npm run package:linux"
+    "package:all": "npm run package:win32 && npm run package:darwin-x64 && npm run package:darwin-arm64 && npm run package:linux",
+    "publish:vsce": "vsce publish --packagePath dist/*.vsix",
+    "publish:vsce:pre-release": "vsce publish --packagePath dist/*.vsix --pre-release",
+    "publish:ovsx": "ovsx publish dist/*.vsix",
+    "publish:ovsx:pre-release": "ovsx publish dist/*.vsix --pre-release"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.10",
@@ -371,6 +375,8 @@
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@types/node": "^25.5.2",
     "@types/vscode": "^1.86.0",
+    "@vscode/vsce": "^3.9.1",
+    "ovsx": "^0.10.11",
     "rollup": "^4.60.2",
     "rollup-plugin-esbuild": "^6.2.1",
     "typescript": "^6.0.2"
