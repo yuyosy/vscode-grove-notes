@@ -2,7 +2,7 @@
   <a href="https://github.com/yuyosy/vscode-grove-notes" target="_blank">
     <img src="resources/icon/product-icon.png" alt="GroveNotes Logo" width="200px">
   </a><br>
-    GroveNotes – Notes Tree View
+    GroveNotes – Note Explorer
 </h1>
 <p align="center">Manage your notes in a tree view directly from the sidebar in VS Code and VS Code-based editors.</p>
 

@@ -1,5 +1,6 @@
 import * as path from 'node:path';
 import * as vscode from 'vscode';
+import { copyPath } from './commands/copy-path';
 import { deleteItem } from './commands/delete-item';
 import { editTags } from './commands/edit-tags';
 import {
@@ -15,15 +16,12 @@ import { listNotes } from './commands/list-notes';
 import { listTags } from './commands/list-tags';
 import { newNote } from './commands/new-note';
 import { openGitignore } from './commands/open-gitignore';
+import { openPreview } from './commands/open-preview';
 import { renameItem } from './commands/rename-item';
+import { revealInExplorer } from './commands/reveal-in-explorer';
 import { maybeInitJj, selectNotesFolder, setupNotes } from './commands/setup';
 import { viewDiff } from './commands/view-diff';
-import {
-  getAutoCommitInterval,
-  getNotePath,
-  getPreviewOpenToSide,
-  getUseJujutsu,
-} from './config';
+import { getAutoCommitInterval, getNotePath, getUseJujutsu } from './config';
 import { Commands as Cmd } from './contributions/commands';
 import {
   Configurations as Conf,
@@ -99,11 +97,6 @@ export function activate(context: vscode.ExtensionContext) {
     }),
 
     vscode.commands.registerCommand(Cmd.NewNote, () => newNote()),
-    vscode.commands.registerCommand(
-      Cmd.NewNoteInFolder,
-      (item: { data: { filePath?: string } }) =>
-        newNote(item?.data?.filePath ?? undefined),
-    ),
     vscode.commands.registerCommand(Cmd.ListNotes, listNotes),
     vscode.commands.registerCommand(Cmd.ListTags, listTags),
 
@@ -125,63 +118,65 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand(Cmd.JjPush, jjPush),
     vscode.commands.registerCommand(Cmd.JjFetch, jjFetch),
 
+    vscode.commands.registerCommand(Cmd.OpenGitignore, openGitignore),
+
+    // view/title toolbar
+    vscode.commands.registerCommand(Cmd.NewNoteInNotesView, () => newNote()),
+    vscode.commands.registerCommand(Cmd.RefreshInNotesView, () =>
+      treeProvider.refresh(),
+    ),
+    vscode.commands.registerCommand(Cmd.JjDescribeInNotesView, jjDescribe),
+    vscode.commands.registerCommand(Cmd.JjNewInNotesView, async () => {
+      await jjNew();
+      treeProvider.refresh();
+    }),
+    vscode.commands.registerCommand(Cmd.JjUndoInNotesView, async () => {
+      await jjUndo();
+      treeProvider.refresh();
+    }),
+    vscode.commands.registerCommand(Cmd.JjRedoInNotesView, async () => {
+      await jjRedo();
+      treeProvider.refresh();
+    }),
+
+    // view/item/context menu (#notesView variants)
     vscode.commands.registerCommand(
-      Cmd.EditTags,
-      (item: { data: { filePath?: string } }) =>
-        editTags(item?.data?.filePath ?? ''),
+      Cmd.EditTagsInNotesView,
+      async (item: { data: { filePath?: string } }) => {
+        await editTags(item?.data?.filePath ?? '');
+        treeProvider.refresh();
+      },
     ),
     vscode.commands.registerCommand(
-      Cmd.RenameItem,
-      (item: { data: { filePath?: string } }) =>
-        renameItem(item?.data?.filePath ?? ''),
+      Cmd.RenameItemInNotesView,
+      async (item: { data: { filePath?: string } }) => {
+        await renameItem(item?.data?.filePath ?? '');
+        treeProvider.refresh();
+      },
     ),
     vscode.commands.registerCommand(
-      Cmd.DeleteItem,
-      (item: { data: { filePath?: string } }) =>
-        deleteItem(item?.data?.filePath ?? ''),
+      Cmd.DeleteItemInNotesView,
+      async (item: { data: { filePath?: string } }) => {
+        await deleteItem(item?.data?.filePath ?? '');
+        treeProvider.refresh();
+      },
     ),
     vscode.commands.registerCommand(
-      Cmd.ViewDiff,
+      Cmd.NewNoteInFolderInNotesView,
+      (item: { data: { filePath?: string } }) =>
+        newNote(item?.data?.filePath ?? undefined),
+    ),
+    vscode.commands.registerCommand(
+      Cmd.RevealInExplorerInNotesView,
+      revealInExplorer,
+    ),
+    vscode.commands.registerCommand(Cmd.CopyPathInNotesView, copyPath),
+    vscode.commands.registerCommand(
+      Cmd.ViewDiffInNotesView,
       (item: { data: { filePath?: string } }) =>
         viewDiff(item?.data?.filePath ?? ''),
     ),
-    vscode.commands.registerCommand(
-      Cmd.RevealInExplorer,
-      (item: { data: { filePath?: string } }) => {
-        const fp = item?.data?.filePath;
-        if (fp) {
-          vscode.commands.executeCommand('revealFileInOS', vscode.Uri.file(fp));
-        }
-      },
-    ),
-    vscode.commands.registerCommand(
-      Cmd.CopyPath,
-      (item: { data: { filePath?: string } }) => {
-        const fp = item?.data?.filePath;
-        if (!fp) return;
-        const sep = vscode.workspace
-          .getConfiguration('explorer')
-          .get<string>('copyPathSeparator', path.sep);
-        const normalized =
-          sep === '/' ? fp.replace(/\\/g, '/') : fp.replace(/\//g, '\\');
-        vscode.env.clipboard.writeText(normalized);
-      },
-    ),
-
-    vscode.commands.registerCommand(
-      Cmd.OpenPreview,
-      (item: { data: { filePath?: string } }) => {
-        const fp = item?.data?.filePath;
-        if (fp) {
-          const cmd = getPreviewOpenToSide()
-            ? 'markdown.showPreviewToSide'
-            : 'markdown.showPreview';
-          vscode.commands.executeCommand(cmd, vscode.Uri.file(fp));
-        }
-      },
-    ),
-
-    vscode.commands.registerCommand(Cmd.OpenGitignore, openGitignore),
+    vscode.commands.registerCommand(Cmd.OpenPreviewInNotesView, openPreview),
   );
 
   // Watch notes folder for file changes so the diff inline button stays in sync

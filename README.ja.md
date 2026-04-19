@@ -2,7 +2,7 @@
   <a href="https://github.com/yuyosy/vscode-grove-notes" target="_blank">
     <img src="resources/icon/product-icon.png" alt="GroveNotes Logo" width="200px">
   </a><br>
-    GroveNotes – Notes Tree View
+    GroveNotes – Note Explorer
 </h1>
 <p align="center">VS CodeおよびVS Codeベースのエディタのサイドバーから、直接ツリー表示でノートを管理できます。</p>
 

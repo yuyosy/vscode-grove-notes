@@ -7,7 +7,6 @@ export const Commands = {
   NotesPathConfigured: id('notesPathConfigured'),
   SelectNotesFolder: id('selectNotesFolder'),
   NewNote: id('newNote'),
-  NewNoteInFolder: id('newNoteInFolder'),
   ListNotes: id('listNotes'),
   ListTags: id('listTags'),
   Refresh: id('refresh'),
@@ -18,12 +17,23 @@ export const Commands = {
   JjRedo: id('jjRedo'),
   JjPush: id('jjPush'),
   JjFetch: id('jjFetch'),
-  EditTags: id('editTags'),
-  RenameItem: id('renameItem'),
-  DeleteItem: id('deleteItem'),
-  ViewDiff: id('viewDiff'),
-  RevealInExplorer: id('revealInExplorer'),
-  CopyPath: id('copyPath'),
-  OpenPreview: id('openPreview'),
   OpenGitignore: id('openGitignore'),
+
+  // in view/title toolbar
+  NewNoteInNotesView: id('newNote#notesView'),
+  RefreshInNotesView: id('refresh#notesView'),
+  JjDescribeInNotesView: id('jjDescribe#notesView'),
+  JjNewInNotesView: id('jjNew#notesView'),
+  JjUndoInNotesView: id('jjUndo#notesView'),
+  JjRedoInNotesView: id('jjRedo#notesView'),
+
+  // in view/item/context menu (#notesView variants with short titles)
+  EditTagsInNotesView: id('editTags#notesView'),
+  RenameItemInNotesView: id('renameItem#notesView'),
+  DeleteItemInNotesView: id('deleteItem#notesView'),
+  NewNoteInFolderInNotesView: id('newNoteInFolder#notesView'),
+  RevealInExplorerInNotesView: id('revealInExplorer#notesView'),
+  CopyPathInNotesView: id('copyPath#notesView'),
+  ViewDiffInNotesView: id('viewDiff#notesView'),
+  OpenPreviewInNotesView: id('openPreview#notesView'),
 };
