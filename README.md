@@ -8,6 +8,10 @@
 
 **日本語版: [README.ja.md](README.ja.md)**
 
+> [!NOTE]  
+> Changes (v0.1 → v0.2):
+> Removed the Jujutsu binary from the extension bundle.
+
 
 ## Features
 GroveNotes is a Visual Studio Code extension that helps you organize and manage your notes without leaving your editor.
