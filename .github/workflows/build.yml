@@ -6,16 +6,8 @@ on:
 
 jobs:
   build:
-    name: Build ${{ matrix.target }}
+    name: Build VSIX
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        target:
-          - win32-x64
-          - darwin-x64
-          - darwin-arm64
-          - linux-x64
 
     steps:
       - name: Checkout repository
@@ -30,19 +22,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Download JJ binary for ${{ matrix.target }}
-        run: npm run download-jj
-        env:
-          TARGET_PLATFORM: ${{ matrix.target }}
-          JJ_VERSION: ${{ github.event.inputs.jj_version || '' }}
-
-      - name: Package Extension for ${{ matrix.target }}
-        run: npm run package:${{ matrix.target }}
+      - name: Package Extension
+        run: npm run package
 
       - name: Upload VSIX artifact
         uses: actions/upload-artifact@v7
         with:
-          name: vsix-${{ matrix.target }}
+          name: vsix
           path: dist/*.vsix
           retention-days: 30
 

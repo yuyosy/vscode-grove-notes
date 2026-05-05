@@ -6,5 +6,6 @@ const id = <T extends string>(config: T) =>
 export const Configurations = {
   NotePath: id('notePath'),
   VersionControlUseJujutsu: id('versionControl.useJujutsu'),
+  VersionControlJjPath: id('versionControl.jjPath'),
   VersionControlAutoCommitInterval: id('versionControl.autoCommitInterval'),
 };

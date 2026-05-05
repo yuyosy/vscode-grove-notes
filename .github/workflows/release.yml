@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build:
-    name: Build all platforms
+    name: Build VSIX
     uses: ./.github/workflows/build.yml
 
   release:
@@ -25,8 +25,7 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           path: dist
-          pattern: vsix-*
-          merge-multiple: true
+          name: vsix
 
       - name: List downloaded artifacts
         run: ls -la dist/

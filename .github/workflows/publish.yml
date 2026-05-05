@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build all platforms
+    name: Build VSIX
     uses: ./.github/workflows/build.yml
 
   publish-marketplace:
@@ -31,8 +31,7 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           path: dist
-          pattern: vsix-*
-          merge-multiple: true
+          name: vsix
 
       - name: List VSIX files
         run: ls -la dist/
@@ -81,8 +80,7 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           path: dist
-          pattern: vsix-*
-          merge-multiple: true
+          name: vsix
 
       - name: List VSIX files
         run: ls -la dist/

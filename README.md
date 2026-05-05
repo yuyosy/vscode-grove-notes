@@ -25,16 +25,16 @@ The extension is available on the Visual Studio Code Marketplace and Open VSX Re
 - [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=yuyosy.vscode-grove-notes)
 - [Open VSX Registry](https://open-vsx.org/extension/yuyosy/vscode-grove-notes)
 
-## Bundled Dependencies
+## Jujutsu Dependency
 
-This extension includes the following bundled binaries:
+This extension does not bundle the `jj` binary.
 
 - **[Jujutsu (jj)](https://github.com/jj-vcs/jj)** - Version control system
   - License: Apache License 2.0
-  - Used for version control features when enabled
-  - The extension will use your system's `jj` installation if available, falling back to the bundled version
+  - Used only when version control features are enabled
+  - GroveNotes resolves `jj` from your system PATH or from the optional `grove-notes.versionControl.jjPath` setting
 
-If you prefer to use your own installation of `jj`, you can install it from:
+If you want to use Jujutsu features, install `jj` from:
 - Official website: https://www.jj-vcs.dev/latest/
 - GitHub releases: https://github.com/jj-vcs/jj/releases
 

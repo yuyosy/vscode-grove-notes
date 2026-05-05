@@ -64,6 +64,11 @@ export function getUseJujutsu(): boolean {
   return getConfig().get<boolean>('versionControl.useJujutsu', true);
 }
 
+/** Optional absolute path to the jj executable. Empty means resolve from PATH. */
+export function getJjPathSetting(): string {
+  return getConfig().get<string>('versionControl.jjPath', '').trim();
+}
+
 export type JjInitMode = 'never' | 'always' | 'ask' | 'askIfGit' | 'autoAsk';
 
 /**

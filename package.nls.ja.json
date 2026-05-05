@@ -54,6 +54,7 @@
   "config.versionControl.autoCommitInterval.description": "Jujutsu による自動コミットの実行間隔（単位: 分）。0 にすると無効になります。",
   "config.versionControl.autoCommitMessage.description": "自動コミット時に使うメッセージです。{{YYYY-MM-DD HH:mm}} などの日付トークンが使えます。",
   "config.versionControl.useJujutsu.description": "Jujutsu (jj) によるバージョン管理機能を使うかどうかを切り替えます。オフにするとツールバーの jj ボタンやコマンドがすべて非表示になります。\n\nJujutsu は Git 互換のバージョン管理システムです。詳しくは[Jujutsu Docs](https://www.jj-vcs.dev/latest/)を参照。",
+  "config.versionControl.jjPath.description": "jj 実行ファイルの絶対パスを指定します。空の場合は PATH から jj を解決します。",
   "config.versionControl.jjInitMode.description": "ノートフォルダーを選択したとき、`.jj` リポジトリが存在しない場合に jj を自動初期化するかどうかを制御します。",
   "config.versionControl.jjInitMode.never": "自動初期化しない。",
   "config.versionControl.jjInitMode.always": ".git の有無に関係なく、確認なしで常に初期化する。",

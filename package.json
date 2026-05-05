@@ -28,7 +28,6 @@
     "jujutsu",
     "version control"
   ],
-  "jjVersion": "0.40.0",
   "activationEvents": [
     "onStartupFinished"
   ],
@@ -420,6 +419,11 @@
           "default": true,
           "markdownDescription": "%config.versionControl.useJujutsu.description%"
         },
+        "grove-notes.versionControl.jjPath": {
+          "type": "string",
+          "default": "",
+          "description": "%config.versionControl.jjPath.description%"
+        },
         "grove-notes.versionControl.jjInitMode": {
           "type": "string",
           "enum": [
@@ -447,16 +451,9 @@
     "compile": "rollup --config rollup.config.ts --configPlugin esbuild",
     "watch": "tsc -watch -p ./",
     "lint": "biome check src",
-    "download-jj": "node scripts/download-jj.js",
-    "clean-jj": "node scripts/clear-jj.js",
     "clean-out": "node scripts/clean-out.js",
     "ensure-dist": "node scripts/ensure-dist.js",
     "package": "vsce package --out dist/",
-    "package:win32-x64": "vsce package --target win32-x64 --out dist/",
-    "package:darwin-x64": "vsce package --target darwin-x64 --out dist/",
-    "package:darwin-arm64": "vsce package --target darwin-arm64 --out dist/",
-    "package:linux-x64": "vsce package --target linux-x64 --out dist/",
-    "package:all": "npm run package:win32-x64 && npm run package:darwin-x64 && npm run package:darwin-arm64 && npm run package:linux-x64",
     "publish:vsce": "vsce publish --packagePath dist/*.vsix",
     "publish:vsce:pre-release": "vsce publish --packagePath dist/*.vsix --pre-release",
     "publish:ovsx": "ovsx publish dist/*.vsix",

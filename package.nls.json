@@ -54,6 +54,7 @@
   "config.versionControl.autoCommitInterval.description": "Auto-commit interval in minutes using Jujutsu. Set to 0 to disable.",
   "config.versionControl.autoCommitMessage.description": "Commit message for auto-commits. Supports date tokens.",
   "config.versionControl.useJujutsu.description": "Enable Jujutsu (jj) version control features. When false, all jj commands and toolbar buttons are hidden.\n\nJujutsu is a Git-compatible version control system. [Learn more](https://www.jj-vcs.dev/latest/) about Jujutsu.",
+  "config.versionControl.jjPath.description": "Optional absolute path to the jj executable. When empty, GroveNotes resolves jj from your PATH.",
   "config.versionControl.jjInitMode.description": "Controls whether jj is automatically initialized when a notes folder is selected and no .jj repository exists.",
   "config.versionControl.jjInitMode.never": "Never initialize automatically.",
   "config.versionControl.jjInitMode.always": "Always initialize without asking, whether or not a .git repository exists.",

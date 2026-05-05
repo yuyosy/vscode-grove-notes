@@ -21,7 +21,12 @@ import { renameItem } from './commands/rename-item';
 import { revealInExplorer } from './commands/reveal-in-explorer';
 import { maybeInitJj, selectNotesFolder, setupNotes } from './commands/setup';
 import { viewDiff } from './commands/view-diff';
-import { getAutoCommitInterval, getNotePath, getUseJujutsu } from './config';
+import {
+  getAutoCommitInterval,
+  getJjPathSetting,
+  getNotePath,
+  getUseJujutsu,
+} from './config';
 import { Commands as Cmd } from './contributions/commands';
 import {
   Configurations as Conf,
@@ -32,7 +37,7 @@ import {
   JJ_PARENT_SCHEME,
   JjParentContentProvider,
 } from './utils/jj-content-provider';
-import { initJjPath, isJjAvailable, jjSource } from './utils/jj-resolver';
+import { initJjPath, isJjAvailable } from './utils/jj-resolver';
 
 /** Syncs the `jjEnabled` context key used by `when` clauses in package.json. */
 function setJjContext(enabled: boolean): void {
@@ -48,20 +53,41 @@ function setNotePathContext(): void {
   );
 }
 
+async function showJjUnavailableNotification(): Promise<void> {
+  const openSettings = 'Open Jujutsu Settings';
+  const disableJj = 'Disable Jujutsu';
+  const picked = await vscode.window.showWarningMessage(
+    'Notes: jj is not available. Jujutsu features are disabled until jj is found.',
+    openSettings,
+    disableJj,
+  );
+
+  if (picked === openSettings) {
+    await vscode.commands.executeCommand(
+      'workbench.action.openSettings',
+      '@ext:yuyosy.vscode-grove-notes grove-notes.versionControl.jjPath',
+    );
+    return;
+  }
+
+  if (picked === disableJj) {
+    await vscode.workspace
+      .getConfiguration(EXTENSION_ID)
+      .update(
+        'versionControl.useJujutsu',
+        false,
+        vscode.ConfigurationTarget.Global,
+      );
+  }
+}
+
 export function activate(context: vscode.ExtensionContext) {
   // --- jj initialisation ---
   const useJj = getUseJujutsu();
   if (useJj) {
-    initJjPath(context.extensionPath);
+    initJjPath(getJjPathSetting());
     if (!isJjAvailable()) {
-      vscode.window.showWarningMessage(
-        'Notes: jj binary not found. Jujutsu features will be unavailable. Install jj or place a bundled binary at resources/bin/<platform>/jj[.exe].',
-      );
-    } else {
-      const src = jjSource(context.extensionPath);
-      if (src === 'bundled') {
-        vscode.window.showInformationMessage('Notes: Using bundled jj binary.');
-      }
+      void showJjUnavailableNotification();
     }
   }
   const jjEnabled = useJj && isJjAvailable();
@@ -220,12 +246,24 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (
         e.affectsConfiguration(Conf.VersionControlUseJujutsu) ||
+        e.affectsConfiguration(Conf.VersionControlJjPath) ||
         e.affectsConfiguration(Conf.NotePath)
       ) {
+        initJjPath(getJjPathSetting());
+
         // Re-evaluate jj context key
         const nowUseJj = getUseJujutsu();
         const nowJjEnabled = nowUseJj && isJjAvailable();
         setJjContext(nowJjEnabled);
+
+        if (
+          nowUseJj &&
+          !isJjAvailable() &&
+          (e.affectsConfiguration(Conf.VersionControlUseJujutsu) ||
+            e.affectsConfiguration(Conf.VersionControlJjPath))
+        ) {
+          void showJjUnavailableNotification();
+        }
 
         // Check for jj init when notePath changes
         if (e.affectsConfiguration(Conf.NotePath)) {
