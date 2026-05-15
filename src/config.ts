@@ -1,72 +1,78 @@
 import * as path from 'node:path';
 import * as vscode from 'vscode';
-
-const SECTION = 'grove-notes';
+import {
+  Configurations as Conf,
+  EXTENSION_ID,
+} from './contributions/configurations';
 
 export function getConfig() {
-  return vscode.workspace.getConfiguration(SECTION);
+  return vscode.workspace.getConfiguration(EXTENSION_ID);
 }
 
 export function getNotePath(): string {
-  return getConfig().get<string>('notePath', '');
+  return getConfig().get<string>(Conf.NotePath) ?? '';
 }
 
 export function getTemplatePath(): string {
-  const explicit = getConfig().get<string>('templatePath', '');
+  const explicit = getConfig().get<string>(Conf.TemplatePath) ?? '';
   if (explicit) return explicit;
   const notePath = getNotePath();
   return notePath ? path.join(notePath, '.templates') : '';
 }
 
 export function getDefaultNoteTitle(): string {
-  return getConfig().get<string>(
-    'defaultNoteTitle',
-    '{{title}}_{{YYYY-MM-DD}}',
+  return (
+    getConfig().get<string>(Conf.DefaultNoteTitle) ?? '{{title}}_{{YYYY-MM-DD}}'
   );
 }
 
 export function getDefaultExtension(): string {
-  return getConfig().get<string>('defaultExtension', 'md');
+  return getConfig().get<string>(Conf.DefaultExtension) ?? 'md';
 }
 
 /** Patterns hidden from the tree view only; still scanned for tags and recent notes. */
 export function getViewHiddenPatterns(): string[] {
-  return getConfig().get<string[]>('view.hiddenPatterns', ['.templates']);
+  return (
+    getConfig().get<string[]>(Conf.ViewHiddenPatterns) ?? [
+      '.gitignore',
+      '.templates',
+    ]
+  );
 }
 
 /** When true, .gitignore patterns in the notes folder are applied to all scans. */
 export function getUseGitignore(): boolean {
-  return getConfig().get<boolean>('view.useGitignore', true);
+  return getConfig().get<boolean>(Conf.ViewUseGitignore) ?? true;
 }
 
 /** When true, file counters start at 1 ({{N}}→_1, no-token→_1). Default false (start at 2). */
 export function getCounterStartsAtOne(): boolean {
-  return getConfig().get<boolean>('counterStartsAtOne', false);
+  return getConfig().get<boolean>(Conf.CounterStartsAtOne) ?? false;
 }
 
 /** Predefined tag list available for quick selection when editing note tags. */
 export function getPredefinedTags(): string[] {
-  return getConfig().get<string[]>('tags.predefined', []);
+  return getConfig().get<string[]>(Conf.TagsPredefined) ?? [];
 }
 
 /** When true, Edit Tags also scans all notes in the workspace for tag candidates. */
 export function getScanWorkspaceTags(): boolean {
-  return getConfig().get<boolean>('tags.scanWorkspace', false);
+  return getConfig().get<boolean>(Conf.TagsScanWorkspace) ?? true;
 }
 
 /** When true, Markdown preview opens to the side; when false, opens in the current column. */
 export function getPreviewOpenToSide(): boolean {
-  return getConfig().get<boolean>('preview.openToSide', false);
+  return getConfig().get<boolean>(Conf.PreviewOpenToSide) ?? false;
 }
 
 /** When false, all Jujutsu/jj features are disabled. */
 export function getUseJujutsu(): boolean {
-  return getConfig().get<boolean>('versionControl.useJujutsu', true);
+  return getConfig().get<boolean>(Conf.VersionControlUseJujutsu) ?? true;
 }
 
 /** Optional absolute path to the jj executable. Empty means resolve from PATH. */
 export function getJjPathSetting(): string {
-  return getConfig().get<string>('versionControl.jjPath', '').trim();
+  return (getConfig().get<string>(Conf.VersionControlJjPath) ?? '').trim();
 }
 
 export type JjInitMode = 'never' | 'always' | 'ask' | 'askIfGit' | 'autoAsk';
@@ -80,23 +86,25 @@ export type JjInitMode = 'never' | 'always' | 'ask' | 'askIfGit' | 'autoAsk';
  *   autoAsk   – init automatically when no .git, ask when .git exists
  */
 export function getJjInitMode(): JjInitMode {
-  return getConfig().get<JjInitMode>('versionControl.jjInitMode', 'askIfGit');
+  return (
+    getConfig().get<JjInitMode>(Conf.VersionControlJjInitMode) ?? 'askIfGit'
+  );
 }
 
 export function getAutoCommitInterval(): number {
-  return getConfig().get<number>('versionControl.autoCommitInterval', 0);
+  return getConfig().get<number>(Conf.VersionControlAutoCommitInterval) ?? 0;
 }
 
 export function getAutoCommitMessage(): string {
-  return getConfig().get<string>(
-    'versionControl.autoCommitMessage',
-    'auto: {{YYYY-MM-DD HH:mm}}',
+  return (
+    getConfig().get<string>(Conf.VersionControlAutoCommitMessage) ??
+    'auto: {{YYYY-MM-DD HH:mm}}'
   );
 }
 
 export async function setNotePath(notePath: string): Promise<void> {
   await getConfig().update(
-    'notePath',
+    Conf.NotePath,
     notePath,
     vscode.ConfigurationTarget.Global,
   );

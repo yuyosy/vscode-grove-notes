@@ -1,11 +1,24 @@
 export const EXTENSION_ID = 'grove-notes' as const;
 
-const id = <T extends string>(config: T) =>
+const fq = <T extends string>(config: T) =>
   `${EXTENSION_ID}.${config}` as const;
 
 export const Configurations = {
-  NotePath: id('notePath'),
-  VersionControlUseJujutsu: id('versionControl.useJujutsu'),
-  VersionControlJjPath: id('versionControl.jjPath'),
-  VersionControlAutoCommitInterval: id('versionControl.autoCommitInterval'),
-};
+  NotePath: 'notePath',
+  TemplatePath: 'templatePath',
+  DefaultNoteTitle: 'defaultNoteTitle',
+  DefaultExtension: 'defaultExtension',
+  ViewHiddenPatterns: 'view.hiddenPatterns',
+  ViewUseGitignore: 'view.useGitignore',
+  CounterStartsAtOne: 'counterStartsAtOne',
+  TagsPredefined: 'tags.predefined',
+  TagsScanWorkspace: 'tags.scanWorkspace',
+  PreviewOpenToSide: 'preview.openToSide',
+  VersionControlUseJujutsu: 'versionControl.useJujutsu',
+  VersionControlJjPath: 'versionControl.jjPath',
+  VersionControlJjInitMode: 'versionControl.jjInitMode',
+  VersionControlAutoCommitInterval: 'versionControl.autoCommitInterval',
+  VersionControlAutoCommitMessage: 'versionControl.autoCommitMessage',
+} as const;
+
+export const toFullConfigKey = <T extends string>(config: T) => fq(config);

@@ -31,6 +31,7 @@ import { Commands as Cmd } from './contributions/commands';
 import {
   Configurations as Conf,
   EXTENSION_ID,
+  toFullConfigKey,
 } from './contributions/configurations';
 import { NotesTreeProvider } from './notes-tree-provider';
 import {
@@ -74,7 +75,7 @@ async function showJjUnavailableNotification(): Promise<void> {
     await vscode.workspace
       .getConfiguration(EXTENSION_ID)
       .update(
-        'versionControl.useJujutsu',
+        Conf.VersionControlUseJujutsu,
         false,
         vscode.ConfigurationTarget.Global,
       );
@@ -250,9 +251,11 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (
-        e.affectsConfiguration(Conf.VersionControlUseJujutsu) ||
-        e.affectsConfiguration(Conf.VersionControlJjPath) ||
-        e.affectsConfiguration(Conf.NotePath)
+        e.affectsConfiguration(
+          toFullConfigKey(Conf.VersionControlUseJujutsu),
+        ) ||
+        e.affectsConfiguration(toFullConfigKey(Conf.VersionControlJjPath)) ||
+        e.affectsConfiguration(toFullConfigKey(Conf.NotePath))
       ) {
         initJjPath(getJjPathSetting());
 
@@ -264,14 +267,16 @@ export function activate(context: vscode.ExtensionContext) {
         if (
           nowUseJj &&
           !isJjAvailable() &&
-          (e.affectsConfiguration(Conf.VersionControlUseJujutsu) ||
-            e.affectsConfiguration(Conf.VersionControlJjPath))
+          (e.affectsConfiguration(
+            toFullConfigKey(Conf.VersionControlUseJujutsu),
+          ) ||
+            e.affectsConfiguration(toFullConfigKey(Conf.VersionControlJjPath)))
         ) {
           void showJjUnavailableNotification();
         }
 
         // Check for jj init when notePath changes
-        if (e.affectsConfiguration(Conf.NotePath)) {
+        if (e.affectsConfiguration(toFullConfigKey(Conf.NotePath))) {
           const notePath = getNotePath();
           if (nowJjEnabled && notePath) {
             maybeInitJj(notePath);
@@ -283,8 +288,10 @@ export function activate(context: vscode.ExtensionContext) {
         }
       }
       if (
-        e.affectsConfiguration(Conf.VersionControlAutoCommitInterval) ||
-        e.affectsConfiguration(Conf.NotePath)
+        e.affectsConfiguration(
+          toFullConfigKey(Conf.VersionControlAutoCommitInterval),
+        ) ||
+        e.affectsConfiguration(toFullConfigKey(Conf.NotePath))
       ) {
         autoCommitDisposable?.dispose();
         autoCommitDisposable = undefined;
