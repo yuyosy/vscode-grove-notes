@@ -151,6 +151,11 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand(Cmd.RefreshInNotesView, () =>
       treeProvider.refresh(),
     ),
+    vscode.commands.registerCommand(Cmd.CollapseAllInNotesView, () =>
+      vscode.commands.executeCommand(
+        'workbench.actions.treeView.notesView.collapseAll',
+      ),
+    ),
     vscode.commands.registerCommand(Cmd.JjDescribeInNotesView, jjDescribe),
     vscode.commands.registerCommand(Cmd.JjNewInNotesView, async () => {
       await jjNew();

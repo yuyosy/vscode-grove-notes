@@ -8,10 +8,6 @@
 
 **English version: [README.md](README.md)**
 
-> [!NOTE]  
-> Changes (v0.1 → v0.2):
-> Jujutsuバイナリを拡張機能バンドルから削除しました。
-
 
 ## 機能
 GroveNotesは、エディタから離れることなくノートを整理・管理できるVisual Studio Code拡張機能です。

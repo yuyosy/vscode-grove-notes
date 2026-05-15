@@ -22,6 +22,7 @@ export const Commands = {
   // in view/title toolbar
   NewNoteInNotesView: id('newNote#notesView'),
   RefreshInNotesView: id('refresh#notesView'),
+  CollapseAllInNotesView: id('collapseAll#notesView'),
   JjDescribeInNotesView: id('jjDescribe#notesView'),
   JjNewInNotesView: id('jjNew#notesView'),
   JjUndoInNotesView: id('jjUndo#notesView'),

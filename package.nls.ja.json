@@ -23,6 +23,7 @@
 
   "command.newNote#notesView.title": "新規ノート作成",
   "command.refresh#notesView.title": "更新",
+  "command.collapseAll#notesView.title": "すべて折りたたむ",
   "command.jjDescribe#notesView.title": "Describe",
   "command.jjNew#notesView.title": "New",
   "command.jjUndo#notesView.title": "元に戻す",
@@ -40,7 +41,7 @@
   "view.notes.name": "GroveNotes",
   "viewsWelcome.notesView.contents": "$(notebook) Notes\n\nノートフォルダーがまだ設定されていません。\nフォルダーを選んで Markdown ノートを管理しましょう。\n\n[$(folder-opened) ノートフォルダーを選択](command:grove-notes.selectNotesFolder)\n\nまたはコマンドパレット（Ctrl+Shift+P）で `Notes: Setup Notes Folder` を実行してください。\n\nパスを直接入力したい場合は $(settings-gear) [設定を開く](command:workbench.action.openSettings?%5B%22grove-notes.notePath%22%5D) から指定できます。\n\nテンプレートパス・ノートタイトルの形式・除外パターン・タグ・Jujutsu 連携など、さまざまな設定が用意されています。\n\n$(settings-gear) [拡張機能の設定を開く](command:workbench.action.openSettings?%5B%22grove-notes%22%5D)",
 
-  "config.title": "Notes",
+  "config.title": "GroveNotes",
   "config.notePath.description": "ノートを保存するフォルダーのパスを指定します",
   "config.templatePath.description": "テンプレートフォルダーのパスを指定します。空の場合は <notePath>/.templates が使われます。",
   "config.defaultNoteTitle.description": "新規ノートのファイル名パターンです。{{YYYY}}・{{MM}}・{{DD}}・{{HH}}・{{mm}}・{{ss}}・{{title}} が使えます。",

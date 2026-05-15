@@ -23,6 +23,7 @@
 
   "command.newNote#notesView.title": "New Note",
   "command.refresh#notesView.title": "Refresh",
+  "command.collapseAll#notesView.title": "Collapse All",
   "command.jjDescribe#notesView.title": "jj Describe",
   "command.jjNew#notesView.title": "jj New",
   "command.jjUndo#notesView.title": "jj Undo",
@@ -40,7 +41,7 @@
   "view.notes.name": "GroveNotes",
   "viewsWelcome.notesView.contents": "$(notebook) Notes\n\nNo notes folder configured yet.\nSelect a folder to start managing your Markdown notes.\n\n[$(folder-opened) Select Notes Folder](command:grove-notes.selectNotesFolder)\n\nOr run `Notes: Setup Notes Folder` from the Command Palette (Ctrl+Shift+P).\n\nAlready have a path? $(settings-gear) [Open Settings](command:workbench.action.openSettings?%5B%22grove-notes.notePath%22%5D) to set it directly.\n\nOther settings include templates path, default note title format, ignore patterns, tags, and Jujutsu version control options. Explore the settings to customize your note-taking experience!\n\n$(settings-gear) [Open Extension Settings](command:workbench.action.openSettings?%5B%22grove-notes%22%5D)",
 
-  "config.title": "Notes",
+  "config.title": "GroveNotes",
   "config.notePath.description": "Path to the notes folder",
   "config.templatePath.description": "Path to the templates folder. Defaults to <notePath>/.templates if empty.",
   "config.defaultNoteTitle.description": "File name format for new notes. Supports {{YYYY}}, {{MM}}, {{DD}}, {{HH}}, {{mm}}, {{ss}}, {{title}}.",
