@@ -8,6 +8,7 @@ export const Configurations = {
   TemplatePath: 'templatePath',
   DefaultNoteTitle: 'defaultNoteTitle',
   DefaultExtension: 'defaultExtension',
+  PathSeparator: 'pathSeparator',
   ViewHiddenPatterns: 'view.hiddenPatterns',
   ViewUseGitignore: 'view.useGitignore',
   CounterStartsAtOne: 'counterStartsAtOne',

@@ -373,6 +373,21 @@
           "default": "md",
           "description": "%config.defaultExtension.description%"
         },
+        "grove-notes.pathSeparator": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "slash",
+            "backslash"
+          ],
+          "enumDescriptions": [
+            "%config.pathSeparator.auto%",
+            "%config.pathSeparator.slash%",
+            "%config.pathSeparator.backslash%"
+          ],
+          "default": "auto",
+          "description": "%config.pathSeparator.description%"
+        },
         "grove-notes.view.hiddenPatterns": {
           "type": "array",
           "items": {

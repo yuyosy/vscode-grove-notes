@@ -1,10 +1,19 @@
-import * as path from 'node:path';
 import * as vscode from 'vscode';
-import { getNotePath, getUseGitignore } from '../config';
-import { getMtime, SYSTEM_IGNORE_PATTERNS, walkDir } from '../utils/file-utils';
+import {
+  getNotePath,
+  getPathSeparatorOption,
+  getUseGitignore,
+} from '../config';
+import {
+  getMtime,
+  getRelativeDisplayPath,
+  SYSTEM_IGNORE_PATTERNS,
+  walkDir,
+} from '../utils/file-utils';
 import { readGitignorePatterns } from '../utils/gitignore-utils';
 
 const LIST_LIMIT = 50;
+type NoteQuickPickItem = vscode.QuickPickItem & { filePath: string };
 
 export async function listNotes(): Promise<void> {
   const notePath = getNotePath();
@@ -28,9 +37,11 @@ export async function listNotes(): Promise<void> {
     return;
   }
 
-  const items: vscode.QuickPickItem[] = files.map((f) => ({
-    label: path.relative(notePath, f),
+  const separatorOption = getPathSeparatorOption();
+  const items: NoteQuickPickItem[] = files.map((f) => ({
+    label: getRelativeDisplayPath(notePath, f, separatorOption),
     description: new Date(getMtime(f)).toLocaleString(),
+    filePath: f,
   }));
 
   const selection = await vscode.window.showQuickPick(items, {
@@ -40,7 +51,6 @@ export async function listNotes(): Promise<void> {
 
   if (!selection) return;
 
-  const filePath = path.join(notePath, selection.label);
-  const doc = await vscode.workspace.openTextDocument(filePath);
+  const doc = await vscode.workspace.openTextDocument(selection.filePath);
   await vscode.window.showTextDocument(doc);
 }

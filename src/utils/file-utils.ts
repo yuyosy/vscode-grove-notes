@@ -8,6 +8,32 @@ import { minimatch } from 'minimatch';
  */
 export const SYSTEM_IGNORE_PATTERNS: ReadonlyArray<string> = ['.git', '.jj'];
 
+export type PathSeparatorOption = 'auto' | 'slash' | 'backslash';
+
+export function resolvePathSeparator(option: PathSeparatorOption): string {
+  if (option === 'slash') return '/';
+  if (option === 'backslash') return '\\';
+  return path.sep;
+}
+
+export function normalizePathSeparators(
+  filePath: string,
+  option: PathSeparatorOption = 'auto',
+): string {
+  const separator = resolvePathSeparator(option);
+  return separator === '/'
+    ? filePath.replaceAll('\\', '/')
+    : filePath.replaceAll('/', '\\');
+}
+
+export function getRelativeDisplayPath(
+  basePath: string,
+  targetPath: string,
+  option: PathSeparatorOption = 'auto',
+): string {
+  return normalizePathSeparators(path.relative(basePath, targetPath), option);
+}
+
 /**
  * Returns true if the given entry should be excluded based on the pattern list.
  *

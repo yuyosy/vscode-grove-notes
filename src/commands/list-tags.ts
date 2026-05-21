@@ -1,11 +1,20 @@
 import * as fs from 'node:fs';
-import * as path from 'node:path';
 import * as vscode from 'vscode';
-import { getNotePath, getUseGitignore } from '../config';
+import {
+  getNotePath,
+  getPathSeparatorOption,
+  getUseGitignore,
+} from '../config';
 import type { TagIndex } from '../types';
-import { SYSTEM_IGNORE_PATTERNS, walkDir } from '../utils/file-utils';
+import {
+  getRelativeDisplayPath,
+  SYSTEM_IGNORE_PATTERNS,
+  walkDir,
+} from '../utils/file-utils';
 import { parseFrontMatter } from '../utils/front-matter';
 import { readGitignorePatterns } from '../utils/gitignore-utils';
+
+type NoteQuickPickItem = vscode.QuickPickItem & { filePath: string };
 
 export async function listTags(): Promise<void> {
   const notePath = getNotePath();
@@ -40,19 +49,19 @@ export async function listTags(): Promise<void> {
   if (!tagSelection) return;
 
   const filesForTag = tagIndex[tagSelection.label];
-  const fileItems: vscode.QuickPickItem[] = filesForTag.map((f) => ({
-    label: path.relative(notePath, f),
+  const separatorOption = getPathSeparatorOption();
+  const fileItems: NoteQuickPickItem[] = filesForTag.map((f) => ({
+    label: getRelativeDisplayPath(notePath, f, separatorOption),
     description: f,
+    filePath: f,
   }));
 
   const fileSelection = await vscode.window.showQuickPick(fileItems, {
     placeHolder: `Notes tagged "${tagSelection.label}"`,
   });
-  if (!fileSelection?.description) return;
+  if (!fileSelection) return;
 
-  const doc = await vscode.workspace.openTextDocument(
-    fileSelection.description,
-  );
+  const doc = await vscode.workspace.openTextDocument(fileSelection.filePath);
   await vscode.window.showTextDocument(doc);
 }
 

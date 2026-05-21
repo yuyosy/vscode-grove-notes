@@ -1,15 +1,16 @@
 import * as fs from 'node:fs';
-import * as path from 'node:path';
 import * as vscode from 'vscode';
 import { getJjModifiedFiles } from './commands/jj-operations';
 import {
   getNotePath,
+  getPathSeparatorOption,
   getUseGitignore,
   getUseJujutsu,
   getViewHiddenPatterns,
 } from './config';
 import type { NoteTreeItem, TagIndex } from './types';
 import {
+  getRelativeDisplayPath,
   readDirEntries,
   SYSTEM_IGNORE_PATTERNS,
   walkDir,
@@ -192,11 +193,12 @@ export class NotesTreeProvider
     ];
     const tagIndex = this._buildTagIndex(notePath, scanPatterns);
     const sortedTags = Object.keys(tagIndex).sort();
+    const separatorOption = getPathSeparatorOption();
 
     return sortedTags.map((tag) => {
       const fileItems: NoteTreeItem[] = tagIndex[tag].map((fp) => ({
         kind: 'file' as const,
-        label: path.relative(notePath, fp),
+        label: getRelativeDisplayPath(notePath, fp, separatorOption),
         filePath: fp,
       }));
 

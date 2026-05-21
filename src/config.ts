@@ -4,6 +4,7 @@ import {
   Configurations as Conf,
   EXTENSION_ID,
 } from './contributions/configurations';
+import type { PathSeparatorOption } from './utils/file-utils';
 
 export function getConfig() {
   return vscode.workspace.getConfiguration(EXTENSION_ID);
@@ -28,6 +29,10 @@ export function getDefaultNoteTitle(): string {
 
 export function getDefaultExtension(): string {
   return getConfig().get<string>(Conf.DefaultExtension) ?? 'md';
+}
+
+export function getPathSeparatorOption(): PathSeparatorOption {
+  return getConfig().get<PathSeparatorOption>(Conf.PathSeparator) ?? 'auto';
 }
 
 /** Patterns hidden from the tree view only; still scanned for tags and recent notes. */
