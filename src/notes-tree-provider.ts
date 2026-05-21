@@ -2,6 +2,8 @@ import * as fs from 'node:fs';
 import * as vscode from 'vscode';
 import { getJjModifiedFiles } from './commands/jj-operations';
 import {
+  getEnableTagsInView,
+  getHideIgnoreFilesInTagsView,
   getNotePath,
   getPathSeparatorOption,
   getUseGitignore,
@@ -99,30 +101,39 @@ export class NotesTreeProvider
       );
     }
 
-    if (kind === 'rootTag') {
-      return this._getTagNodes();
-    }
+    if (getEnableTagsInView()) {
+      if (kind === 'rootTag') {
+        return this._getTagNodes();
+      }
 
-    if (kind === 'tag' && element.data.files) {
-      return element.data.files.map((f) =>
-        this._makeFileItem(f, this._modifiedFilesCache),
-      );
+      if (kind === 'tag' && element.data.files) {
+        return element.data.files.map((f) =>
+          this._makeFileItem(f, this._modifiedFilesCache),
+        );
+      }
     }
 
     return [];
   }
 
   private _getRoots(): NotesTreeItem[] {
-    return [
+    const roots: NotesTreeItem[] = [
       new NotesTreeItem(
         { kind: 'rootFile', label: 'Files' },
         vscode.TreeItemCollapsibleState.Expanded,
       ),
-      new NotesTreeItem(
-        { kind: 'rootTag', label: 'Tags' },
-        vscode.TreeItemCollapsibleState.Collapsed,
-      ),
     ];
+
+    if (getEnableTagsInView()) {
+      roots.push(
+        new NotesTreeItem(
+          { kind: 'rootTag', label: 'Tags' },
+          vscode.TreeItemCollapsibleState.Collapsed,
+        ),
+      );
+    }
+
+    return roots;
   }
 
   private _getDirChildren(
@@ -191,6 +202,9 @@ export class NotesTreeProvider
     const scanPatterns = [
       ...new Set([...ignorePatterns, ...gitignorePatterns]),
     ];
+    if (getHideIgnoreFilesInTagsView()) {
+      scanPatterns.push(...getViewHiddenPatterns());
+    }
     const tagIndex = this._buildTagIndex(notePath, scanPatterns);
     const sortedTags = Object.keys(tagIndex).sort();
     const separatorOption = getPathSeparatorOption();

@@ -60,6 +60,16 @@ export function getPredefinedTags(): string[] {
   return getConfig().get<string[]>(Conf.TagsPredefined) ?? [];
 }
 
+/** When true, tags are shown in the tree view. When false, tags are hidden to reduce clutter. */
+export function getEnableTagsInView(): boolean {
+  return getConfig().get<boolean>(Conf.TagsEnableInView) ?? true;
+}
+
+/** When true, ignored files are hidden in the tags view. */
+export function getHideIgnoreFilesInTagsView(): boolean {
+  return getConfig().get<boolean>(Conf.HideIgnoreFilesInTagsView) ?? true;
+}
+
 /** When true, Edit Tags also scans all notes in the workspace for tag candidates. */
 export function getScanWorkspaceTags(): boolean {
   return getConfig().get<boolean>(Conf.TagsScanWorkspace) ?? true;

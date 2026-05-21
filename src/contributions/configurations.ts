@@ -13,6 +13,8 @@ export const Configurations = {
   ViewUseGitignore: 'view.useGitignore',
   CounterStartsAtOne: 'counterStartsAtOne',
   TagsPredefined: 'tags.predefined',
+  TagsEnableInView: 'tags.enableTagsInView',
+  HideIgnoreFilesInTagsView: 'tags.hideIgnoreFilesInTagsView',
   TagsScanWorkspace: 'tags.scanWorkspace',
   PreviewOpenToSide: 'preview.openToSide',
   VersionControlUseJujutsu: 'versionControl.useJujutsu',

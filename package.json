@@ -422,6 +422,16 @@
           ],
           "description": "%config.tags.predefined.description%"
         },
+        "grove-notes.tags.enableTagsInView": {
+          "type": "boolean",
+          "default": true,
+          "description": "%config.tags.enableTagsInView.description%"
+        },
+        "grove-notes.tags.hideIgnoreFilesInTagsView": {
+          "type": "boolean",
+          "default": true,
+          "description": "%config.tags.hideIgnoreFilesInTagsView.description%"
+        },
         "grove-notes.tags.scanWorkspace": {
           "type": "boolean",
           "default": true,
