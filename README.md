@@ -40,7 +40,12 @@ If you want to use Jujutsu features, install `jj` from:
 
 ## Usage / Screenshots
 
-TODO: Add usage instructions and screenshots here.
+Once you have GroveNotes installed, you can open the Notes view from the sidebar.  
+From there, you can create new notes and folders, organize them in a tree structure, and manage them with ease. Right-clicking on items in the tree view will show a context menu with various actions you can perform on your notes and folders.  
+![Screenshot - VS Code](images/screenshot-1.png)
+
+Right-click context menu for notes and folders:  
+![Screenshot - Right-click context menu](images/screenshot-2.png)
 
 ## Template Variables
 
@@ -92,23 +97,23 @@ Within the folder name, `.` is treated as a path separator:
 
 | Template folder | Example (2026-04-15) |
 |---|---|
-| `{{YYYY}}.{{YYYY-MM}}.{{YYYY-MM-DD}}` | `notes/2026/2026-04/2026-04-15/` |
-| `{{YYYY}}.{{MM}}` | `notes/2026/04/` |
-| `archive.{{YYYY}}` | `notes/archive/2026/` |
+| `{{YYYY}}.{{YYYY-MM}}.{{YYYY-MM-DD}}` | `2026/2026-04/2026-04-15/` |
+| `{{YYYY}}.{{MM}}` | `2026/04/` |
+| `archive.{{YYYY}}` | `archive/2026/` |
 
 To include a literal `.` in a folder name without splitting, use `{{.}}`:
 
 ```
-v1{{.}}0  →  notes/v1.0/
+v1{{.}}0  →  v1.0/
 ```
 
 When templates are stored in nested sub-folders inside the templates directory, that folder hierarchy is preserved as-is and combined with the `.` expansion:
 
 | Templates directory structure | Example (2026-04-15) |
 |---|---|
-| `.templates/diary/{{YYYY}}.{{MM}}/` | `notes/diary/2026/04/` |
-| `.templates/work/{{YYYY}}.{{MM}}.{{DD}}/` | `notes/work/2026/04/15/` |
-| `.templates/archive/{{YYYY}}/` | `notes/archive/2026/` |
+| `.templates/diary/{{YYYY}}.{{MM}}/` | `diary/2026/04/` |
+| `.templates/work/{{YYYY}}.{{MM}}.{{DD}}/` | `work/2026/04/15/` |
+| `.templates/archive/{{YYYY}}/` | `archive/2026/` |
 
 ## Contributing
 

@@ -39,8 +39,12 @@ Jujutsu機能を利用する場合は、以下から `jj` をインストール�
 - GitHubリリース: https://github.com/jj-vcs/jj/releases
 
 ## 使い方 / スクリーンショット
+GroveNotesをインストールしたら、サイドバーからノートビューを開くことができます。  
+新しいノートやフォルダを作成し、ツリー構造で整理して簡単に管理できます。ツリービューのアイテムを右クリックすると、ノートやフォルダに対して基本的なアクションも利用できます。
+![Screenshot - VS Code](images/screenshot-1.png)
 
-TODO: 使い方とスクリーンショットをここに追加します。
+ノートやフォルダの右クリックコンテキストメニュー:  
+![Screenshot - Right-click context menu](images/screenshot-2.png)
 
 ## テンプレート変数
 
@@ -92,23 +96,23 @@ TODO: 使い方とスクリーンショットをここに追加します。
 
 | テンプレートフォルダ | 例（2026-04-15の場合） |
 |---|---|
-| `{{YYYY}}.{{YYYY-MM}}.{{YYYY-MM-DD}}` | `notes/2026/2026-04/2026-04-15/` |
-| `{{YYYY}}.{{MM}}` | `notes/2026/04/` |
-| `archive.{{YYYY}}` | `notes/archive/2026/` |
+| `{{YYYY}}.{{YYYY-MM}}.{{YYYY-MM-DD}}` | `2026/2026-04/2026-04-15/` |
+| `{{YYYY}}.{{MM}}` | `2026/04/` |
+| `archive.{{YYYY}}` | `archive/2026/` |
 
 フォルダ名に分割せずにリテラルの`.`を含めるには、`{{.}}`を使用します：
 
 ```
-v1{{.}}0  →  notes/v1.0/
+v1{{.}}0  →  v1.0/
 ```
 
 テンプレートディレクトリ内のネストされたサブフォルダにテンプレートが保存されている場合、そのフォルダ階層はそのまま保持され、`.`展開と組み合わされます：
 
 | テンプレートディレクトリ構造 | 例（2026-04-15の場合） |
 |---|---|
-| `.templates/diary/{{YYYY}}.{{MM}}/` | `notes/diary/2026/04/` |
-| `.templates/work/{{YYYY}}.{{MM}}.{{DD}}/` | `notes/work/2026/04/15/` |
-| `.templates/archive/{{YYYY}}/` | `notes/archive/2026/` |
+| `.templates/diary/{{YYYY}}.{{MM}}/` | `diary/2026/04/` |
+| `.templates/work/{{YYYY}}.{{MM}}.{{DD}}/` | `work/2026/04/15/` |
+| `.templates/archive/{{YYYY}}/` | `archive/2026/` |
 
 ## Contributing
 
