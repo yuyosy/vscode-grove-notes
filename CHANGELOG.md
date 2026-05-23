@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v0.3.0 - [Unreleased]
+## v0.3.0 - 2026-05-23
 - Add new settings
   - Add `grove-notes.pathSeparator` setting with `auto`, `/`, and `\` options.
   - Add `grove-notes.hideIgnoreFilesInTagsView` setting to control visibility of .gitignored files in the tags view.
