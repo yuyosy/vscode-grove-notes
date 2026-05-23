@@ -105,6 +105,10 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   const treeProvider = new NotesTreeProvider();
+  const notesTreeView = vscode.window.createTreeView('notesView', {
+    treeDataProvider: treeProvider,
+    dragAndDropController: treeProvider,
+  });
 
   context.subscriptions.push(
     vscode.workspace.registerTextDocumentContentProvider(
@@ -112,7 +116,7 @@ export function activate(context: vscode.ExtensionContext) {
       new JjParentContentProvider(),
     ),
 
-    vscode.window.registerTreeDataProvider('notesView', treeProvider),
+    notesTreeView,
 
     vscode.commands.registerCommand(Cmd.Setup, async () => {
       await setupNotes();

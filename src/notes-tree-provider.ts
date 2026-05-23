@@ -1,4 +1,5 @@
 import * as fs from 'node:fs';
+import * as path from 'node:path';
 import * as vscode from 'vscode';
 import { getJjModifiedFiles } from './commands/jj-operations';
 import {
@@ -55,8 +56,13 @@ export class NotesTreeItem extends vscode.TreeItem {
 }
 
 export class NotesTreeProvider
-  implements vscode.TreeDataProvider<NotesTreeItem>
+  implements
+    vscode.TreeDataProvider<NotesTreeItem>,
+    vscode.TreeDragAndDropController<NotesTreeItem>
 {
+  readonly dragMimeTypes = ['application/vnd.code.tree.notesView'];
+  readonly dropMimeTypes = ['application/vnd.code.tree.notesView'];
+
   private _onDidChangeTreeData = new vscode.EventEmitter<
     // biome-ignore lint/suspicious/noConfusingVoidType: required by vscode.TreeDataProvider
     NotesTreeItem | undefined | null | void
@@ -77,6 +83,92 @@ export class NotesTreeProvider
 
   getTreeItem(element: NotesTreeItem): vscode.TreeItem {
     return element;
+  }
+
+  async handleDrag(
+    source: readonly NotesTreeItem[],
+    dataTransfer: vscode.DataTransfer,
+  ): Promise<void> {
+    const draggableItems = source
+      .filter((item) => item.data.kind === 'file' || item.data.kind === 'dir')
+      .map((item) => item.data.filePath)
+      .filter((filePath): filePath is string => !!filePath);
+
+    if (draggableItems.length === 0) return;
+
+    dataTransfer.set(
+      'application/vnd.code.tree.notesView',
+      new vscode.DataTransferItem(JSON.stringify(draggableItems)),
+    );
+  }
+
+  async handleDrop(
+    target: NotesTreeItem | undefined,
+    dataTransfer: vscode.DataTransfer,
+  ): Promise<void> {
+    const notePath = getNotePath();
+    if (!notePath) return;
+
+    const destinationDir = this._resolveDropDirectory(target, notePath);
+    if (!destinationDir) return;
+
+    const transferItem = dataTransfer.get(
+      'application/vnd.code.tree.notesView',
+    );
+    const serialized = transferItem ? await transferItem.asString() : '';
+    if (!serialized) return;
+
+    let sourcePaths: string[];
+    try {
+      sourcePaths = JSON.parse(serialized) as string[];
+    } catch {
+      return;
+    }
+
+    const uniquePaths = [...new Set(sourcePaths)];
+    const movePlan: Array<{ sourcePath: string; destinationPath: string }> = [];
+
+    for (const sourcePath of uniquePaths) {
+      if (!this._isMovablePath(sourcePath, notePath)) {
+        vscode.window.showWarningMessage(
+          'Only items inside the notes folder can be moved.',
+        );
+        return;
+      }
+
+      const destinationPath = path.join(
+        destinationDir,
+        path.basename(sourcePath),
+      );
+      const validationMessage = this._validateMove(
+        sourcePath,
+        destinationDir,
+        destinationPath,
+      );
+      if (validationMessage) {
+        vscode.window.showWarningMessage(validationMessage);
+        return;
+      }
+
+      movePlan.push({ sourcePath, destinationPath });
+    }
+
+    for (const { sourcePath, destinationPath } of movePlan) {
+      try {
+        await vscode.workspace.fs.rename(
+          vscode.Uri.file(sourcePath),
+          vscode.Uri.file(destinationPath),
+          { overwrite: false },
+        );
+      } catch (err: unknown) {
+        vscode.window.showErrorMessage(
+          `Move failed: ${(err as Error).message}`,
+        );
+        return;
+      }
+    }
+
+    this.refresh();
   }
 
   getChildren(element?: NotesTreeItem): vscode.ProviderResult<NotesTreeItem[]> {
@@ -245,5 +337,43 @@ export class NotesTreeProvider
     }
 
     return index;
+  }
+
+  private _resolveDropDirectory(
+    target: NotesTreeItem | undefined,
+    notePath: string,
+  ): string | undefined {
+    if (!target || target.data.kind === 'rootFile') return notePath;
+    if (target.data.kind === 'dir') return target.data.filePath;
+    return undefined;
+  }
+
+  private _isMovablePath(filePath: string, notePath: string): boolean {
+    const relativePath = path.relative(notePath, filePath);
+    return relativePath !== '' && !relativePath.startsWith('..');
+  }
+
+  private _validateMove(
+    sourcePath: string,
+    destinationDir: string,
+    destinationPath: string,
+  ): string | undefined {
+    const sourceDir = path.dirname(sourcePath);
+    if (sourceDir === destinationDir) {
+      return 'Item is already in that folder.';
+    }
+
+    if (fs.existsSync(destinationPath)) {
+      return 'A file or folder with the same name already exists in the destination.';
+    }
+
+    if (fs.existsSync(sourcePath) && fs.statSync(sourcePath).isDirectory()) {
+      const relativePath = path.relative(sourcePath, destinationDir);
+      if (relativePath === '' || !relativePath.startsWith('..')) {
+        return 'A folder cannot be moved into itself.';
+      }
+    }
+
+    return undefined;
   }
 }
