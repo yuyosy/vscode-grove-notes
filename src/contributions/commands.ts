@@ -27,6 +27,7 @@ export const Commands = {
   JjNewInNotesView: id('jjNew#notesView'),
   JjUndoInNotesView: id('jjUndo#notesView'),
   JjRedoInNotesView: id('jjRedo#notesView'),
+  OpenSettingsInNotesView: id('openSettings#notesView'),
 
   // in view/item/context menu (#notesView variants with short titles)
   EditTagsInNotesView: id('editTags#notesView'),

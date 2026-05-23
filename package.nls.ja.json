@@ -28,6 +28,7 @@
   "command.jjNew#notesView.title": "New",
   "command.jjUndo#notesView.title": "元に戻す",
   "command.jjRedo#notesView.title": "やり直し",
+  "command.openSettings#notesView.title": "設定を開く",
   "command.editTags#notesView.title": "タグを編集",
   "command.renameItem#notesView.title": "名前を変更",
   "command.deleteItem#notesView.title": "削除",

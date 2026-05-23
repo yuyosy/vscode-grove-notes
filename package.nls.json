@@ -28,6 +28,7 @@
   "command.jjNew#notesView.title": "jj New",
   "command.jjUndo#notesView.title": "jj Undo",
   "command.jjRedo#notesView.title": "jj Redo",
+  "command.openSettings#notesView.title": "Open Settings",
   "command.editTags#notesView.title": "Edit Tags",
   "command.renameItem#notesView.title": "Rename",
   "command.deleteItem#notesView.title": "Delete",

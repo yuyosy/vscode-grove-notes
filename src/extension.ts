@@ -170,6 +170,12 @@ export function activate(context: vscode.ExtensionContext) {
       await jjRedo();
       treeProvider.refresh();
     }),
+    vscode.commands.registerCommand(Cmd.OpenSettingsInNotesView, () =>
+      vscode.commands.executeCommand(
+        'workbench.action.openSettings',
+        `@ext:${context.extension.id}`,
+      ),
+    ),
 
     // view/item/context menu (#notesView variants)
     vscode.commands.registerCommand(

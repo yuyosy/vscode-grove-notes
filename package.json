@@ -2,7 +2,7 @@
   "name": "vscode-grove-notes",
   "displayName": "GroveNotes - Note Explorer",
   "description": "%extension.description%",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "publisher": "yuyosy",
   "license": "MIT",
   "repository": {
@@ -131,6 +131,11 @@
         "command": "grove-notes.jjRedo#notesView",
         "title": "%command.jjRedo#notesView.title%",
         "icon": "$(redo)"
+      },
+      {
+        "command": "grove-notes.openSettings#notesView",
+        "title": "%command.openSettings#notesView.title%",
+        "icon": "$(settings-gear)"
       },
       {
         "command": "grove-notes.editTags#notesView",
@@ -266,16 +271,6 @@
           "group": "navigation@1"
         },
         {
-          "command": "grove-notes.jjDescribe#notesView",
-          "when": "view == notesView && grove-notes.jjEnabled",
-          "group": "navigation@2"
-        },
-        {
-          "command": "grove-notes.jjNew#notesView",
-          "when": "view == notesView && grove-notes.jjEnabled",
-          "group": "navigation@3"
-        },
-        {
           "command": "grove-notes.refresh#notesView",
           "when": "view == notesView",
           "group": "navigation@4"
@@ -286,6 +281,16 @@
           "group": "navigation@5"
         },
         {
+          "command": "grove-notes.jjDescribe#notesView",
+          "when": "view == notesView && grove-notes.jjEnabled",
+          "group": "1_vcs@1"
+        },
+        {
+          "command": "grove-notes.jjNew#notesView",
+          "when": "view == notesView && grove-notes.jjEnabled",
+          "group": "1_vcs@2"
+        },
+        {
           "command": "grove-notes.jjUndo#notesView",
           "when": "view == notesView && grove-notes.jjEnabled",
           "group": "1_vcs@3"
@@ -294,6 +299,11 @@
           "command": "grove-notes.jjRedo#notesView",
           "when": "view == notesView && grove-notes.jjEnabled",
           "group": "1_vcs@4"
+        },
+        {
+          "command": "grove-notes.openSettings#notesView",
+          "when": "view == notesView",
+          "group": "settings@1"
         }
       ],
       "view/item/context": [
