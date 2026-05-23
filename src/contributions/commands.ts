@@ -34,6 +34,7 @@ export const Commands = {
   RenameItemInNotesView: id('renameItem#notesView'),
   DeleteItemInNotesView: id('deleteItem#notesView'),
   NewNoteInFolderInNotesView: id('newNoteInFolder#notesView'),
+  NewFolderInNotesView: id('newFolder#notesView'),
   RevealInExplorerInNotesView: id('revealInExplorer#notesView'),
   CopyPathInNotesView: id('copyPath#notesView'),
   ViewDiffInNotesView: id('viewDiff#notesView'),

@@ -22,6 +22,7 @@
   "command.openGitignore.title": "GroveNotes: Open .gitignore",
 
   "command.newNote#notesView.title": "New Note",
+  "command.newFolder#notesView.title": "New Folder",
   "command.refresh#notesView.title": "Refresh",
   "command.collapseAll#notesView.title": "Collapse All",
   "command.jjDescribe#notesView.title": "jj Describe",

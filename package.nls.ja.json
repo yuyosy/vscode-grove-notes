@@ -22,6 +22,7 @@
   "command.openGitignore.title": "GroveNotes: .gitignore を開く",
 
   "command.newNote#notesView.title": "新規ノート作成",
+  "command.newFolder#notesView.title": "新規フォルダー作成",
   "command.refresh#notesView.title": "更新",
   "command.collapseAll#notesView.title": "すべて折りたたむ",
   "command.jjDescribe#notesView.title": "Describe",

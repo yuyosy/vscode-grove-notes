@@ -103,6 +103,11 @@
         "icon": "$(add)"
       },
       {
+        "command": "grove-notes.newFolder#notesView",
+        "title": "%command.newFolder#notesView.title%",
+        "icon": "$(new-folder)"
+      },
+      {
         "command": "grove-notes.refresh#notesView",
         "title": "%command.refresh#notesView.title%",
         "icon": "$(refresh)"
@@ -248,6 +253,10 @@
           "when": "false"
         },
         {
+          "command": "grove-notes.newFolder#notesView",
+          "when": "false"
+        },
+        {
           "command": "grove-notes.revealInExplorer#notesView",
           "when": "false"
         },
@@ -308,6 +317,21 @@
       ],
       "view/item/context": [
         {
+          "command": "grove-notes.newNote#notesView",
+          "when": "view == notesView && viewItem == rootFile",
+          "group": "navigation@1"
+        },
+        {
+          "command": "grove-notes.newFolder#notesView",
+          "when": "view == notesView && viewItem == rootFile",
+          "group": "navigation@2"
+        },
+        {
+          "command": "grove-notes.refresh#notesView",
+          "when": "view == notesView && viewItem == rootFile",
+          "group": "navigation@3"
+        },
+        {
           "command": "grove-notes.editTags#notesView",
           "when": "view == notesView && viewItem =~ /noteFile/",
           "group": "notes_1_tags@1"
@@ -338,9 +362,14 @@
           "group": "notes_2_file@2"
         },
         {
+          "command": "grove-notes.newFolder#notesView",
+          "when": "view == notesView && viewItem == noteDir",
+          "group": "notes_2_file@3"
+        },
+        {
           "command": "grove-notes.deleteItem#notesView",
           "when": "view == notesView && (viewItem =~ /noteFile/ || viewItem == noteDir)",
-          "group": "notes_2_file@3"
+          "group": "notes_2_file@4"
         },
         {
           "command": "grove-notes.revealInExplorer#notesView",

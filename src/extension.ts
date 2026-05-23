@@ -14,6 +14,7 @@ import {
 } from './commands/jj-operations';
 import { listNotes } from './commands/list-notes';
 import { listTags } from './commands/list-tags';
+import { newFolder } from './commands/new-folder';
 import { newNote } from './commands/new-note';
 import { openGitignore } from './commands/open-gitignore';
 import { openPreview } from './commands/open-preview';
@@ -149,6 +150,11 @@ export function activate(context: vscode.ExtensionContext) {
 
     // view/title toolbar
     vscode.commands.registerCommand(Cmd.NewNoteInNotesView, () => newNote()),
+    vscode.commands.registerCommand(
+      Cmd.NewFolderInNotesView,
+      (item?: { data?: { filePath?: string } }) =>
+        newFolder(item?.data?.filePath ?? undefined),
+    ),
     vscode.commands.registerCommand(Cmd.RefreshInNotesView, () =>
       treeProvider.refresh(),
     ),
