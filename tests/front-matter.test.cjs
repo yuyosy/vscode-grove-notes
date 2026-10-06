@@ -30,3 +30,22 @@ test('malformed YAML and missing delimiters fail without rewriting content', () 
   }
   assert.equal(parseFrontMatter('Body\n---\ntags: []\n---'), null);
 });
+
+test('indented metadata remains valid when tags are replaced or inserted', () => {
+  for (const text of ['---\n    title: Keep\n    tags: []\n---\nBody', '---\n    title: Keep\n---\nBody']) {
+    const result = writeTags(text, ['new']);
+    assert.deepEqual(parseFrontMatter(result).tags, ['new']);
+    assert.match(result, /    title: Keep\n/);
+  }
+});
+
+test('anchors on the tags field survive so other metadata aliases remain valid', () => {
+  const { parse } = require('yaml');
+  for (const tags of [['new'], []]) {
+    const result = writeTags('---\ntags: &tagList [old]\nrelated: *tagList\n---\nBody', tags);
+    const metadata = parse(result.split('---\n')[1]);
+    assert.deepEqual(metadata.tags, tags);
+    assert.deepEqual(metadata.related, tags);
+    assert.match(result, /related: \*tagList\n/);
+  }
+});

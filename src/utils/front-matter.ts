@@ -18,7 +18,7 @@ export function parseFrontMatter(text: string): FrontMatter | null {
   const match = getFrontMatter(text);
   if (!match) return null;
   const document = parseDocument(match[2]);
-  if (document.errors.length > 0) return null;
+  if (document.errors.length > 0 || !isMap(document.contents)) return null;
   const tags = document.get('tags', true);
   return {
     tags: isSeq(tags)
@@ -32,7 +32,7 @@ export function parseFrontMatter(text: string): FrontMatter | null {
 /** Replaces only the tags field; all other metadata and the body stay intact. */
 export function writeTags(text: string, tags: string[]): string {
   const eol = text.includes('\r\n') ? '\r\n' : '\n';
-  const tagBlock = tags.length
+  let tagBlock = tags.length
     ? `tags:${eol}${tags.map((tag) => `  - ${JSON.stringify(tag)}`).join(eol)}`
     : 'tags: []';
   const match = getFrontMatter(text);
@@ -59,7 +59,17 @@ export function writeTags(text: string, tags: string[]): string {
     : undefined;
   let newBlock: string;
   if (pair && isScalar(pair.key) && pair.key.range) {
-    const start = pair.key.range[0];
+    const keyStart = pair.key.range[0];
+    const start = block.lastIndexOf('\n', keyStart - 1) + 1;
+    const indentation = block.slice(start, keyStart);
+    const value = pair.value;
+    if ((isScalar(value) || isSeq(value) || isMap(value)) && value.anchor) {
+      tagBlock = tagBlock.replace('tags:', () => `tags: &${value.anchor}`);
+    }
+    tagBlock = tagBlock
+      .split(eol)
+      .map((line) => `${indentation}${line}`)
+      .join(eol);
     const lineEnd = block.indexOf('\n', start);
     const end = Math.max(
       pair.value?.range?.[2] ?? 0,
@@ -67,6 +77,20 @@ export function writeTags(text: string, tags: string[]): string {
     );
     newBlock = `${block.slice(0, start)}${tagBlock}${eol}${block.slice(end)}`;
   } else {
+    const firstKey = isMap(document.contents)
+      ? document.contents.items[0]?.key
+      : undefined;
+    if (isScalar(firstKey) && firstKey.range) {
+      const start = firstKey.range[0];
+      const indentation = block.slice(
+        block.lastIndexOf('\n', start - 1) + 1,
+        start,
+      );
+      tagBlock = tagBlock
+        .split(eol)
+        .map((line) => `${indentation}${line}`)
+        .join(eol);
+    }
     newBlock = `${block}${block && !block.endsWith('\n') ? eol : ''}${tagBlock}${eol}`;
   }
   return `${match[1]}${newBlock}${text.slice(match[1].length + block.length)}`;
