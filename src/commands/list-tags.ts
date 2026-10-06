@@ -1,18 +1,15 @@
-import * as fs from 'node:fs';
 import * as vscode from 'vscode';
 import {
   getNotePath,
   getPathSeparatorOption,
   getUseGitignore,
 } from '../config';
-import type { TagIndex } from '../types';
 import {
   getRelativeDisplayPath,
   SYSTEM_IGNORE_PATTERNS,
-  walkDir,
 } from '../utils/file-utils';
-import { parseFrontMatter } from '../utils/front-matter';
 import { readGitignorePatterns } from '../utils/gitignore-utils';
+import { buildTagIndex } from '../utils/tag-index';
 
 type NoteQuickPickItem = vscode.QuickPickItem & { filePath: string };
 
@@ -63,31 +60,4 @@ export async function listTags(): Promise<void> {
 
   const doc = await vscode.workspace.openTextDocument(fileSelection.filePath);
   await vscode.window.showTextDocument(doc);
-}
-
-export function buildTagIndex(
-  notePath: string,
-  ignorePatterns: string[],
-): TagIndex {
-  const files = walkDir(notePath, ignorePatterns).filter((f) =>
-    f.endsWith('.md'),
-  );
-  const index: TagIndex = {};
-
-  for (const file of files) {
-    let text: string;
-    try {
-      text = fs.readFileSync(file, 'utf8');
-    } catch {
-      continue;
-    }
-    const fm = parseFrontMatter(text);
-    if (!fm || fm.tags.length === 0) continue;
-    for (const tag of fm.tags) {
-      if (!index[tag]) index[tag] = [];
-      index[tag].push(file);
-    }
-  }
-
-  return index;
 }

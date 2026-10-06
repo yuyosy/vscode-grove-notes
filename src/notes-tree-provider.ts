@@ -11,16 +11,15 @@ import {
   getUseJujutsu,
   getViewHiddenPatterns,
 } from './config';
-import type { NoteTreeItem, TagIndex } from './types';
+import type { NoteTreeItem } from './types';
 import {
   getRelativeDisplayPath,
   readDirEntries,
   SYSTEM_IGNORE_PATTERNS,
-  walkDir,
 } from './utils/file-utils';
-import { parseFrontMatter } from './utils/front-matter';
 import { readGitignorePatterns } from './utils/gitignore-utils';
 import { isJjAvailable } from './utils/jj-resolver';
+import { buildTagIndex } from './utils/tag-index';
 
 export class NotesTreeItem extends vscode.TreeItem {
   constructor(
@@ -297,7 +296,7 @@ export class NotesTreeProvider
     if (getHideIgnoreFilesInTagsView()) {
       scanPatterns.push(...getViewHiddenPatterns());
     }
-    const tagIndex = this._buildTagIndex(notePath, scanPatterns);
+    const tagIndex = buildTagIndex(notePath, scanPatterns);
     const sortedTags = Object.keys(tagIndex).sort();
     const separatorOption = getPathSeparatorOption();
 
@@ -313,30 +312,6 @@ export class NotesTreeProvider
         vscode.TreeItemCollapsibleState.Collapsed,
       );
     });
-  }
-
-  private _buildTagIndex(notePath: string, ignorePatterns: string[]): TagIndex {
-    const files = walkDir(notePath, ignorePatterns).filter((f) =>
-      f.endsWith('.md'),
-    );
-    const index: TagIndex = {};
-
-    for (const file of files) {
-      let text: string;
-      try {
-        text = fs.readFileSync(file, 'utf8');
-      } catch {
-        continue;
-      }
-      const fm = parseFrontMatter(text);
-      if (!fm || fm.tags.length === 0) continue;
-      for (const tag of fm.tags) {
-        if (!index[tag]) index[tag] = [];
-        index[tag].push(file);
-      }
-    }
-
-    return index;
   }
 
   private _resolveDropDirectory(

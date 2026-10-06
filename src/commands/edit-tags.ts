@@ -8,7 +8,7 @@ import {
 import { SYSTEM_IGNORE_PATTERNS } from '../utils/file-utils';
 import { parseFrontMatter, writeTags } from '../utils/front-matter';
 import { readGitignorePatterns } from '../utils/gitignore-utils';
-import { buildTagIndex } from './list-tags';
+import { buildTagIndex } from '../utils/tag-index';
 
 /**
  * Opens a multi-select QuickPick to edit the tags of a Markdown note.
