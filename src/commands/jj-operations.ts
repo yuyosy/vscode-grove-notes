@@ -2,11 +2,12 @@ import { execFile, execFileSync } from 'node:child_process';
 import * as path from 'node:path';
 import { promisify } from 'node:util';
 import * as vscode from 'vscode';
-import { getAutoCommitMessage, getNotePath } from '../config';
+import { getAutoCommitMessage, getNotePath, getUseJujutsu } from '../config';
 import { formatDateTokens } from '../utils/date-format';
 import { getJjPath, isJjAvailable } from '../utils/jj-resolver';
 
 const execFileAsync = promisify(execFile);
+let autoCommitRunning = false;
 
 async function runJj(
   args: string[],
@@ -202,19 +203,35 @@ export function startAutoCommit(
   onComplete?: () => void,
 ): vscode.Disposable {
   const ms = intervalMinutes * 60 * 1000;
+  let disposed = false;
   const timer = setInterval(async () => {
     const notePath = getNotePath();
-    if (!notePath) return;
+    if (
+      disposed ||
+      autoCommitRunning ||
+      !notePath ||
+      !getUseJujutsu() ||
+      !isJjAvailable()
+    )
+      return;
 
-    const message = formatDateTokens(getAutoCommitMessage());
+    autoCommitRunning = true;
     try {
+      const message = formatDateTokens(getAutoCommitMessage());
       await runJj(['describe', '--message', message], notePath);
+      // A setting change can stop or replace this timer while describe is running.
+      if (disposed || !getUseJujutsu() || notePath !== getNotePath()) return;
       await runJj(['new'], notePath);
-      onComplete?.();
+      if (!disposed) onComplete?.();
     } catch {
       // Auto-commit failures are silent to avoid interrupting the user
+    } finally {
+      autoCommitRunning = false;
     }
   }, ms);
 
-  return new vscode.Disposable(() => clearInterval(timer));
+  return new vscode.Disposable(() => {
+    disposed = true;
+    clearInterval(timer);
+  });
 }

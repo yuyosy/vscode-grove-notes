@@ -254,16 +254,24 @@ export function activate(context: vscode.ExtensionContext) {
     if (np) startFsWatcher(np);
   }
 
-  // Auto-commit timer
-  const interval = getAutoCommitInterval();
-  if (interval > 0) {
-    context.subscriptions.push(
-      startAutoCommit(interval, () => treeProvider.refresh()),
-    );
-  }
+  // Keep a single timer, including the one created on activation.
+  let autoCommitDisposable: vscode.Disposable | undefined;
+  const updateAutoCommit = () => {
+    autoCommitDisposable?.dispose();
+    autoCommitDisposable = undefined;
+    const interval = getAutoCommitInterval();
+    if (interval > 0 && getNotePath() && getUseJujutsu() && isJjAvailable()) {
+      autoCommitDisposable = startAutoCommit(interval, () =>
+        treeProvider.refresh(),
+      );
+    }
+  };
+  context.subscriptions.push(
+    new vscode.Disposable(() => autoCommitDisposable?.dispose()),
+  );
+  updateAutoCommit();
 
   // Re-register auto-commit when config changes
-  let autoCommitDisposable: vscode.Disposable | undefined;
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (
@@ -307,17 +315,13 @@ export function activate(context: vscode.ExtensionContext) {
         e.affectsConfiguration(
           toFullConfigKey(Conf.VersionControlAutoCommitInterval),
         ) ||
+        e.affectsConfiguration(
+          toFullConfigKey(Conf.VersionControlUseJujutsu),
+        ) ||
+        e.affectsConfiguration(toFullConfigKey(Conf.VersionControlJjPath)) ||
         e.affectsConfiguration(toFullConfigKey(Conf.NotePath))
       ) {
-        autoCommitDisposable?.dispose();
-        autoCommitDisposable = undefined;
-        const newInterval = getAutoCommitInterval();
-        if (newInterval > 0) {
-          autoCommitDisposable = startAutoCommit(newInterval, () =>
-            treeProvider.refresh(),
-          );
-          context.subscriptions.push(autoCommitDisposable);
-        }
+        updateAutoCommit();
       }
       if (e.affectsConfiguration(EXTENSION_ID)) {
         setNotePathContext();
