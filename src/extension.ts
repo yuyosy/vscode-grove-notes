@@ -227,32 +227,30 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand(Cmd.OpenPreviewInNotesView, openPreview),
   );
 
-  // Watch notes folder for file changes so the diff inline button stays in sync
+  // Watch notes independently of Jujutsu so external edits always update the view.
   let fsWatcher: vscode.FileSystemWatcher | undefined;
   const startFsWatcher = (np: string) => {
     fsWatcher?.dispose();
+    fsWatcher = undefined;
+    if (!np) return;
     fsWatcher = vscode.workspace.createFileSystemWatcher(
       new vscode.RelativePattern(np, '**'),
     );
     const refresh = (uri: vscode.Uri) => {
       // Ignore internal vcs metadata to avoid unnecessary refreshes
-      const fp = uri.fsPath;
+      const segments = path.relative(np, uri.fsPath).split(/[\\/]/);
       if (
-        !fp.startsWith(path.join(np, '.jj')) &&
-        !fp.startsWith(path.join(np, '.git'))
+        !segments.some((segment) => segment === '.jj' || segment === '.git')
       ) {
         treeProvider.refresh();
       }
     };
-    fsWatcher.onDidCreate(refresh, null, context.subscriptions);
-    fsWatcher.onDidChange(refresh, null, context.subscriptions);
-    fsWatcher.onDidDelete(refresh, null, context.subscriptions);
-    context.subscriptions.push(fsWatcher);
+    fsWatcher.onDidCreate(refresh);
+    fsWatcher.onDidChange(refresh);
+    fsWatcher.onDidDelete(refresh);
   };
-  if (jjEnabled) {
-    const np = getNotePath();
-    if (np) startFsWatcher(np);
-  }
+  context.subscriptions.push(new vscode.Disposable(() => fsWatcher?.dispose()));
+  startFsWatcher(getNotePath());
 
   // Keep a single timer, including the one created on activation.
   let autoCommitDisposable: vscode.Disposable | undefined;
@@ -304,11 +302,8 @@ export function activate(context: vscode.ExtensionContext) {
           const notePath = getNotePath();
           if (nowJjEnabled && notePath) {
             maybeInitJj(notePath);
-            startFsWatcher(notePath);
-          } else {
-            fsWatcher?.dispose();
-            fsWatcher = undefined;
           }
+          startFsWatcher(notePath);
         }
       }
       if (
