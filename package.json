@@ -535,7 +535,9 @@
     "publish:vsce": "vsce publish --packagePath dist/*.vsix",
     "publish:vsce:pre-release": "vsce publish --packagePath dist/*.vsix --pre-release",
     "publish:ovsx": "ovsx publish dist/*.vsix",
-    "publish:ovsx:pre-release": "ovsx publish dist/*.vsix --pre-release"
+    "publish:ovsx:pre-release": "ovsx publish dist/*.vsix --pre-release",
+    "test": "node --test",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.10",
@@ -550,6 +552,7 @@
     "typescript": "^6.0.2"
   },
   "dependencies": {
-    "minimatch": "^10.2.5"
+    "minimatch": "^10.2.5",
+    "yaml": "^2.9.1"
   }
 }

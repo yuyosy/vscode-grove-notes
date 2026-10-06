@@ -49,6 +49,12 @@ jobs:
       - name: Compile TypeScript
         run: npm run compile
 
+      - name: Check types
+        run: npm run typecheck
+
+      - name: Run regression tests
+        run: npm test
+
       - name: Check for compilation errors
         run: |
           if [ -d "out" ]; then

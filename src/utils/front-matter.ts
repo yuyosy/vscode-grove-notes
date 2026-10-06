@@ -1,98 +1,73 @@
-/**
- * Parses YAML front matter from a Markdown file's text content.
- * Only handles the subset needed: `tags` as an array.
- *
- * Supports two common YAML array styles:
- *   tags: [foo, bar]
- *   tags:
- *     - foo
- *     - bar
- */
+import { isMap, isScalar, isSeq, parseDocument } from 'yaml';
+
 export interface FrontMatter {
   tags: string[];
   [key: string]: unknown;
 }
 
+function getFrontMatter(text: string) {
+  const match =
+    /^(\uFEFF?---[ \t]*\r?\n)([\s\S]*?)(^(?:---|\.\.\.)[ \t]*(?:\r?\n|$))/m.exec(
+      text,
+    );
+  return match?.index === 0 ? match : null;
+}
+
+/** Reads tags using YAML syntax, including quoted commas and special characters. */
 export function parseFrontMatter(text: string): FrontMatter | null {
-  // Must start with ---
-  if (!text.startsWith('---')) return null;
-
-  const end = text.indexOf('\n---', 3);
-  if (end === -1) return null;
-
-  const block = text.slice(3, end).trim();
-
-  const tags = extractTags(block);
-  return { tags };
+  const match = getFrontMatter(text);
+  if (!match) return null;
+  const document = parseDocument(match[2]);
+  if (document.errors.length > 0) return null;
+  const tags = document.get('tags', true);
+  return {
+    tags: isSeq(tags)
+      ? tags.items.flatMap((item) =>
+          isScalar(item) && typeof item.value === 'string' ? [item.value] : [],
+        )
+      : [],
+  };
 }
 
-function extractTags(yamlBlock: string): string[] {
-  // Inline array style: tags: [foo, bar]
-  const inlineMatch = yamlBlock.match(/^tags\s*:\s*\[([^\]]*)\]/m);
-  if (inlineMatch) {
-    return inlineMatch[1]
-      .split(',')
-      .map((t) => t.trim().replace(/^['"]|['"]$/g, ''))
-      .filter(Boolean);
+/** Replaces only the tags field; all other metadata and the body stay intact. */
+export function writeTags(text: string, tags: string[]): string {
+  const eol = text.includes('\r\n') ? '\r\n' : '\n';
+  const tagBlock = tags.length
+    ? `tags:${eol}${tags.map((tag) => `  - ${JSON.stringify(tag)}`).join(eol)}`
+    : 'tags: []';
+  const match = getFrontMatter(text);
+  if (!match) {
+    if (/^\uFEFF?---[ \t]*(?:\r?\n|$)/.test(text)) {
+      throw new Error('Front matter has no closing delimiter.');
+    }
+    const bom = text.startsWith('\uFEFF') ? '\uFEFF' : '';
+    return `${bom}---${eol}${tagBlock}${eol}---${eol}${eol}${text.slice(bom.length)}`;
   }
 
-  // Block list style:
-  //   tags:
-  //     - foo
-  // Walk line-by-line to avoid regex end-of-string issues.
-  const lines = yamlBlock.split('\n');
-  const tagsLineIdx = lines.findIndex((l) => /^tags\s*:/.test(l));
-  if (tagsLineIdx === -1) return [];
-
-  const tags: string[] = [];
-  for (let i = tagsLineIdx + 1; i < lines.length; i++) {
-    const trimmed = lines[i].trimEnd();
-    // Stop if we hit a non-indented, non-empty line (another YAML key)
-    if (trimmed.length > 0 && !/^\s/.test(trimmed)) break;
-    const item = trimmed.match(/^\s+-\s+['"]?(.+?)['"]?\s*$/);
-    if (item) tags.push(item[1].trim());
+  const block = match[2];
+  const document = parseDocument(block);
+  if (
+    document.errors.length > 0 ||
+    (document.contents && !isMap(document.contents))
+  ) {
+    throw new Error('Cannot edit tags in invalid YAML front matter.');
   }
-  return tags;
-}
-
-/**
- * Writes (or replaces) the `tags` field in a file's YAML front matter.
- *
- * - If the file has no front matter, prepends one.
- * - If a `tags:` key exists, replaces it in place.
- * - Other front matter fields are preserved unchanged.
- * - Uses block-list style:
- *     tags:
- *       - foo
- *       - bar
- */
-export function writeTags(filePath: string, tags: string[]): void {
-  const fs = require('node:fs') as typeof import('node:fs');
-  let text: string;
-  try {
-    text = fs.readFileSync(filePath, 'utf8');
-  } catch {
-    return;
-  }
-
-  const tagBlock =
-    tags.length === 0
-      ? 'tags: []'
-      : `tags:\n${tags.map((t) => `  - ${t}`).join('\n')}`;
-
-  const fmStart = text.startsWith('---');
-  const fmEnd = fmStart ? text.indexOf('\n---', 3) : -1;
-
-  if (fmStart && fmEnd !== -1) {
-    const block = text.slice(3, fmEnd).trim();
-    const tagsRe = /^tags\s*:.*(?:\n(?:[ \t]+.*)*)*/m;
-    const newBlock = tagsRe.test(block)
-      ? block.replace(tagsRe, tagBlock)
-      : `${block}\n${tagBlock}`;
-    const rest = text.slice(fmEnd + 4); // skip closing \n---
-    fs.writeFileSync(filePath, `---\n${newBlock}\n---${rest}`, 'utf8');
+  const pair = isMap(document.contents)
+    ? document.contents.items.find(
+        (item) => isScalar(item.key) && item.key.value === 'tags',
+      )
+    : undefined;
+  let newBlock: string;
+  if (pair && isScalar(pair.key) && pair.key.range) {
+    const start = pair.key.range[0];
+    const lineEnd = block.indexOf('\n', start);
+    const end = Math.max(
+      pair.value?.range?.[2] ?? 0,
+      lineEnd < 0 ? block.length : lineEnd + 1,
+    );
+    newBlock = `${block.slice(0, start)}${tagBlock}${eol}${block.slice(end)}`;
   } else {
-    // No front matter — prepend
-    fs.writeFileSync(filePath, `---\n${tagBlock}\n---\n\n${text}`, 'utf8');
+    newBlock = `${block}${block && !block.endsWith('\n') ? eol : ''}${tagBlock}${eol}`;
   }
+  return `${match[1]}${newBlock}${text.slice(match[1].length + block.length)}`;
 }

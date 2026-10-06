@@ -1,4 +1,3 @@
-import * as fs from 'node:fs';
 import * as vscode from 'vscode';
 import {
   getNotePath,
@@ -24,14 +23,20 @@ import { buildTagIndex } from './list-tags';
 export async function editTags(filePath: string): Promise<void> {
   if (!filePath) return;
 
-  // Current tags in this file
-  let currentTags: string[] = [];
+  // Read the editor buffer so unsaved changes are included.
+  let document: vscode.TextDocument;
   try {
-    const text = fs.readFileSync(filePath, 'utf8');
-    currentTags = parseFrontMatter(text)?.tags ?? [];
-  } catch {
-    // File unreadable — start with empty
+    document = await vscode.workspace.openTextDocument(
+      vscode.Uri.file(filePath),
+    );
+  } catch (err: unknown) {
+    vscode.window.showErrorMessage(
+      `Cannot open note: ${(err as Error).message}`,
+    );
+    return;
   }
+  const currentTags = parseFrontMatter(document.getText())?.tags ?? [];
+  const version = document.version;
 
   // Predefined tags from settings
   const predefined = getPredefinedTags();
@@ -90,11 +95,44 @@ export async function editTags(filePath: string): Promise<void> {
 
   if (chosen === undefined) return; // Esc → cancelled
 
-  writeTags(filePath, chosen);
-  // writeTags writes directly to disk; VS Code's file watcher will auto-reload
-  // any open editor that has no unsaved changes.
+  if (document.isClosed || document.version !== version) {
+    vscode.window.showWarningMessage(
+      'The note changed while editing tags. Please try again.',
+    );
+    return;
+  }
+  const text = document.getText();
+  let updated: string;
+  try {
+    updated = writeTags(text, chosen);
+  } catch (err: unknown) {
+    vscode.window.showErrorMessage(
+      `Cannot edit tags: ${(err as Error).message}`,
+    );
+    return;
+  }
+  const wasDirty = document.isDirty;
+  const edit = new vscode.WorkspaceEdit();
+  edit.replace(
+    document.uri,
+    new vscode.Range(document.positionAt(0), document.positionAt(text.length)),
+    updated,
+  );
+  if (!(await vscode.workspace.applyEdit(edit))) {
+    vscode.window.showErrorMessage('Could not apply tag changes.');
+    return;
+  }
+  // Keep an already dirty buffer unsaved; save only previously clean documents.
+  if (!wasDirty && !(await document.save())) {
+    vscode.window.showWarningMessage(
+      'Tags were updated in the editor but could not be saved.',
+    );
+    return;
+  }
 
   vscode.window.showInformationMessage(
-    chosen.length === 0 ? 'Tags cleared.' : `Tags saved: ${chosen.join(', ')}`,
+    chosen.length === 0
+      ? 'Tags cleared.'
+      : `Tags updated: ${chosen.join(', ')}`,
   );
 }
