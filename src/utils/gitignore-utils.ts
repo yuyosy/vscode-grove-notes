@@ -1,27 +1,59 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import ignore from 'ignore';
 
-/**
- * Reads the `.gitignore` file in `folderPath` and returns the list of patterns,
- * with the following lines stripped out:
- *  - blank lines
- *  - comment lines (starting with `#`)
- *  - negation patterns (starting with `!`) — not supported by the extension's scanner
- */
+/** Preserve rule order, negations, escaped characters and trailing spaces. */
 export function readGitignorePatterns(folderPath: string): string[] {
-  const gitignorePath = path.join(folderPath, '.gitignore');
-  let text: string;
   try {
-    text = fs.readFileSync(gitignorePath, 'utf8');
+    return fs
+      .readFileSync(path.join(folderPath, '.gitignore'), 'utf8')
+      .split(/\r?\n/);
   } catch {
     return [];
   }
+}
 
-  return text
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(
-      (line) =>
-        line.length > 0 && !line.startsWith('#') && !line.startsWith('!'),
-    );
+/** Applies root and nested .gitignore rules with Git's excluded-parent semantics. */
+export function createGitignoreFilter(rootPath: string) {
+  const root = path.resolve(rootPath);
+  const matchers = new Map<string, ReturnType<typeof ignore>>();
+  const directories = new Map<string, boolean>();
+  const isIgnored = (filePath: string, isDirectory: boolean): boolean => {
+    const fullPath = path.resolve(filePath);
+    const relative = path.relative(root, fullPath);
+    if (
+      !relative ||
+      relative === '..' ||
+      relative.startsWith(`..${path.sep}`) ||
+      path.isAbsolute(relative)
+    )
+      return false;
+    if (isDirectory && directories.has(fullPath))
+      return directories.get(fullPath) ?? false;
+    const parent = path.dirname(fullPath);
+    if (parent !== root && isIgnored(parent, true)) return true;
+
+    const ancestors: string[] = [];
+    for (let dir = parent; ; dir = path.dirname(dir)) {
+      ancestors.unshift(dir);
+      if (dir === root) break;
+    }
+    let ignored = false;
+    for (const dir of ancestors) {
+      let matcher = matchers.get(dir);
+      if (!matcher) {
+        matcher = ignore({ ignorecase: false }).add(readGitignorePatterns(dir));
+        matchers.set(dir, matcher);
+      }
+      const target =
+        path.relative(dir, fullPath).replace(/\\/g, '/') +
+        (isDirectory ? '/' : '');
+      const result = matcher.test(target);
+      if (result.ignored) ignored = true;
+      else if (result.unignored) ignored = false;
+    }
+    if (isDirectory) directories.set(fullPath, ignored);
+    return ignored;
+  };
+  return isIgnored;
 }

@@ -7,10 +7,11 @@ import { parseFrontMatter } from './front-matter';
 export function buildTagIndex(
   notePath: string,
   ignorePatterns: string[],
+  useGitignore = false,
 ): TagIndex {
   const index: TagIndex = Object.create(null);
-  for (const file of walkDir(notePath, ignorePatterns).filter((file) =>
-    file.endsWith('.md'),
+  for (const file of walkDir(notePath, ignorePatterns, useGitignore).filter(
+    (file) => file.endsWith('.md'),
   )) {
     let text: string;
     try {

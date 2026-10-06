@@ -17,7 +17,6 @@ import {
   readDirEntries,
   SYSTEM_IGNORE_PATTERNS,
 } from './utils/file-utils';
-import { readGitignorePatterns } from './utils/gitignore-utils';
 import { isJjAvailable } from './utils/jj-resolver';
 import { buildTagIndex } from './utils/tag-index';
 
@@ -232,17 +231,16 @@ export class NotesTreeProvider
     modifiedFiles: Set<string>,
   ): NotesTreeItem[] {
     const notePath = getNotePath();
-    const gitignorePatterns =
-      notePath && getUseGitignore() ? readGitignorePatterns(notePath) : [];
     const hiddenPatterns = getViewHiddenPatterns();
     const viewPatterns = [
-      ...new Set([
-        ...SYSTEM_IGNORE_PATTERNS,
-        ...gitignorePatterns,
-        ...hiddenPatterns,
-      ]),
+      ...new Set([...SYSTEM_IGNORE_PATTERNS, ...hiddenPatterns]),
     ];
-    const entries = readDirEntries(dirPath, viewPatterns);
+    const entries = readDirEntries(
+      dirPath,
+      viewPatterns,
+      notePath || dirPath,
+      getUseGitignore(),
+    );
 
     // Directories first, then files, each sorted alphabetically
     const dirs = entries.filter((e) => e.isDirectory);
@@ -286,17 +284,11 @@ export class NotesTreeProvider
     const notePath = getNotePath();
     if (!notePath) return [];
 
-    const ignorePatterns = [...SYSTEM_IGNORE_PATTERNS];
-    const gitignorePatterns = getUseGitignore()
-      ? readGitignorePatterns(notePath)
-      : [];
-    const scanPatterns = [
-      ...new Set([...ignorePatterns, ...gitignorePatterns]),
-    ];
+    const scanPatterns = [...SYSTEM_IGNORE_PATTERNS];
     if (getHideIgnoreFilesInTagsView()) {
       scanPatterns.push(...getViewHiddenPatterns());
     }
-    const tagIndex = buildTagIndex(notePath, scanPatterns);
+    const tagIndex = buildTagIndex(notePath, scanPatterns, getUseGitignore());
     const sortedTags = Object.keys(tagIndex).sort();
     const separatorOption = getPathSeparatorOption();
 

@@ -552,6 +552,7 @@
     "typescript": "^6.0.2"
   },
   "dependencies": {
+    "ignore": "^7.0.5",
     "minimatch": "^10.2.5",
     "yaml": "^2.9.1"
   }

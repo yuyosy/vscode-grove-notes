@@ -10,7 +10,6 @@ import {
   SYSTEM_IGNORE_PATTERNS,
   walkDir,
 } from '../utils/file-utils';
-import { readGitignorePatterns } from '../utils/gitignore-utils';
 
 const LIST_LIMIT = 50;
 type NoteQuickPickItem = vscode.QuickPickItem & { filePath: string };
@@ -22,13 +21,11 @@ export async function listNotes(): Promise<void> {
     return;
   }
 
-  const gitignorePatterns = getUseGitignore()
-    ? readGitignorePatterns(notePath)
-    : [];
-  const scanPatterns = [
-    ...new Set([...SYSTEM_IGNORE_PATTERNS, ...gitignorePatterns]),
-  ];
-  const files = walkDir(notePath, scanPatterns)
+  const files = walkDir(
+    notePath,
+    [...SYSTEM_IGNORE_PATTERNS],
+    getUseGitignore(),
+  )
     .sort((a, b) => getMtime(b) - getMtime(a))
     .slice(0, LIST_LIMIT);
 

@@ -1,6 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { minimatch } from 'minimatch';
+import { createGitignoreFilter } from './gitignore-utils';
 
 /**
  * VCS metadata directories that are always excluded from all scans and views,
@@ -64,9 +65,14 @@ function matchesAnyPattern(
 }
 
 /** Recursively walks a directory, returning absolute paths of all files. */
-export function walkDir(dir: string, ignorePatterns: string[] = []): string[] {
+export function walkDir(
+  dir: string,
+  ignorePatterns: string[] = [],
+  useGitignore = false,
+): string[] {
   const results: string[] = [];
   if (!fs.existsSync(dir)) return results;
+  const gitignored = useGitignore ? createGitignoreFilter(dir) : () => false;
 
   function walk(current: string) {
     let entries: fs.Dirent[];
@@ -76,9 +82,13 @@ export function walkDir(dir: string, ignorePatterns: string[] = []): string[] {
       return;
     }
     for (const entry of entries) {
-      const relPath = path.relative(dir, path.join(current, entry.name));
-      if (matchesAnyPattern(entry.name, relPath, ignorePatterns)) continue;
       const full = path.join(current, entry.name);
+      const relPath = path.relative(dir, full);
+      if (
+        matchesAnyPattern(entry.name, relPath, ignorePatterns) ||
+        gitignored(full, entry.isDirectory())
+      )
+        continue;
       if (entry.isDirectory()) {
         walk(full);
       } else if (entry.isFile()) {
@@ -95,12 +105,26 @@ export function walkDir(dir: string, ignorePatterns: string[] = []): string[] {
 export function readDirEntries(
   dir: string,
   ignorePatterns: string[] = [],
+  rootPath: string = dir,
+  useGitignore = false,
 ): { name: string; fullPath: string; isDirectory: boolean }[] {
   if (!fs.existsSync(dir)) return [];
   try {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
+    const gitignored = useGitignore
+      ? createGitignoreFilter(rootPath)
+      : () => false;
     return entries
-      .filter((e) => !matchesAnyPattern(e.name, e.name, ignorePatterns))
+      .filter((e) => {
+        const fullPath = path.join(dir, e.name);
+        return (
+          !matchesAnyPattern(
+            e.name,
+            path.relative(rootPath, fullPath),
+            ignorePatterns,
+          ) && !gitignored(fullPath, e.isDirectory())
+        );
+      })
       .map((e) => ({
         name: e.name,
         fullPath: path.join(dir, e.name),

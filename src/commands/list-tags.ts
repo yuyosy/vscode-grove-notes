@@ -8,7 +8,6 @@ import {
   getRelativeDisplayPath,
   SYSTEM_IGNORE_PATTERNS,
 } from '../utils/file-utils';
-import { readGitignorePatterns } from '../utils/gitignore-utils';
 import { buildTagIndex } from '../utils/tag-index';
 
 type NoteQuickPickItem = vscode.QuickPickItem & { filePath: string };
@@ -20,13 +19,11 @@ export async function listTags(): Promise<void> {
     return;
   }
 
-  const gitignorePatterns = getUseGitignore()
-    ? readGitignorePatterns(notePath)
-    : [];
-  const scanPatterns = [
-    ...new Set([...SYSTEM_IGNORE_PATTERNS, ...gitignorePatterns]),
-  ];
-  const tagIndex = buildTagIndex(notePath, scanPatterns);
+  const tagIndex = buildTagIndex(
+    notePath,
+    [...SYSTEM_IGNORE_PATTERNS],
+    getUseGitignore(),
+  );
   const tags = Object.keys(tagIndex).sort();
 
   if (tags.length === 0) {
