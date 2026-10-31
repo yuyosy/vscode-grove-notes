@@ -5,6 +5,9 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Build VSIX
@@ -14,6 +17,10 @@ jobs:
     name: Publish to VS Code Marketplace
     needs: build
     runs-on: ubuntu-latest
+    environment: publish
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -21,7 +28,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '26'
           cache: 'npm'
 
       - name: Install dependencies
@@ -55,14 +62,16 @@ jobs:
           else
             npm run publish:vsce
           fi
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
         timeout-minutes: 5
 
   publish-openvsx:
     name: Publish to Open VSX Registry
     needs: build
     runs-on: ubuntu-latest
+    environment: publish
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -70,7 +79,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '26'
           cache: 'npm'
 
       - name: Install dependencies
@@ -104,6 +113,4 @@ jobs:
           else
             npm run publish:ovsx
           fi
-        env:
-          OVSX_PAT: ${{ secrets.OPENVSX_TOKEN }}
         timeout-minutes: 5
