@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Refer to the GitHub main branch for the latest changes after release.
 
+## [0.4.0] - 2026-11-16
+
+### Added
+
+- The **Recent** section shows notes in the order they were last opened. Set `grove-notes.view.recentLimit` to change the maximum from the default of 20, or set it to `0` to hide the section while keeping its history.
+- The **Pinned** section provides quick access to notes. Use **Pin Note** and **Unpin Note** from a note's context menu to manage it.
+- Recent history and pins are saved per notes folder. Entries follow notes when renamed or moved in VS Code and are removed when notes are deleted.
+
+### Changed
+
+- Renamed the existing command that lists notes by modification time to **List Recently Modified Notes**.
+
 ## [0.3.1] - 2026-10-31
 
 ### Fixed
@@ -64,7 +76,8 @@ Refer to the GitHub main branch for the latest changes after release.
 
 - Initial release.
 
-[Unreleased]: https://github.com/yuyosy/vscode-grove-notes/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/yuyosy/vscode-grove-notes/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/yuyosy/vscode-grove-notes/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/yuyosy/vscode-grove-notes/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/yuyosy/vscode-grove-notes/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/yuyosy/vscode-grove-notes/compare/v0.2.0...v0.2.1
