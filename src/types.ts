@@ -1,11 +1,17 @@
-export type TreeNodeKind = 'rootFile' | 'rootTag' | 'file' | 'dir' | 'tag';
+export type TreeNodeKind =
+  | 'rootRecent'
+  | 'rootFile'
+  | 'rootTag'
+  | 'file'
+  | 'dir'
+  | 'tag';
 
 export interface NoteTreeItem {
   kind: TreeNodeKind;
   label: string;
   /** Absolute path (for file/dir nodes) */
   filePath?: string;
-  /** Child file paths (for tag nodes) */
+  /** Child files (for tag and activity section nodes) */
   files?: NoteTreeItem[];
 }
 

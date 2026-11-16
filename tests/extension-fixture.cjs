@@ -11,9 +11,11 @@ exports.activateFixture = (overrides = {}) => {
     Disposable: class { constructor(fn) { this.dispose = fn; } },
     RelativePattern: class { constructor(base) { this.base = base; } },
     commands: { executeCommand: () => {}, registerCommand: () => ({ dispose() {} }) },
-    window: { createTreeView: () => ({ dispose() {} }), showWarningMessage: async () => undefined },
+    window: { createTreeView: () => ({ dispose() {} }), showWarningMessage: async () => undefined, onDidChangeActiveTextEditor: () => ({ dispose() {} }) },
     workspace: {
       registerTextDocumentContentProvider: () => ({ dispose() {} }),
+      onDidRenameFiles: () => ({ dispose() {} }),
+      onDidDeleteFiles: () => ({ dispose() {} }),
       onDidChangeConfiguration: (handler) => { onConfig = handler; return { dispose() {} }; },
       createFileSystemWatcher: (pattern) => {
         const watcher = { base: pattern.base, disposed: false, dispose() { this.disposed = true; }, onDidCreate(fn) { this.create = fn; }, onDidChange(fn) { this.change = fn; }, onDidDelete(fn) { this.delete = fn; } };
@@ -30,7 +32,7 @@ exports.activateFixture = (overrides = {}) => {
   mocks['./utils/jj-resolver'] = { initJjPath() {}, isJjAvailable: () => state.available };
   mocks['./utils/jj-content-provider'] = { JJ_PARENT_SCHEME: 'jj', JjParentContentProvider: class {} };
   mocks['./notes-tree-provider'] = { NotesTreeProvider: class { refresh() { refreshes++; } } };
-  load('src/extension.ts', mocks).activate({ subscriptions, extension: { id: 'grove-notes' } });
+  load('src/extension.ts', mocks).activate({ subscriptions, globalState: {}, extension: { id: 'grove-notes' } });
   return {
     state, timers, watchers,
     refreshes: () => refreshes,

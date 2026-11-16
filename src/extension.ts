@@ -26,6 +26,8 @@ import {
   getAutoCommitInterval,
   getJjPathSetting,
   getNotePath,
+  getRecentLimit,
+  getUseGitignore,
   getUseJujutsu,
 } from './config';
 import { Commands as Cmd } from './contributions/commands';
@@ -35,6 +37,7 @@ import {
   toFullConfigKey,
 } from './contributions/configurations';
 import { NotesTreeProvider } from './notes-tree-provider';
+import type { NoteTreeItem } from './types';
 import {
   JJ_PARENT_SCHEME,
   JjParentContentProvider,
@@ -104,11 +107,22 @@ export function activate(context: vscode.ExtensionContext) {
     }
   }
 
-  const treeProvider = new NotesTreeProvider();
+  const treeProvider = new NotesTreeProvider(context.globalState);
   const notesTreeView = vscode.window.createTreeView('notesView', {
     treeDataProvider: treeProvider,
     dragAndDropController: treeProvider,
   });
+  const recordNote = (uri: vscode.Uri | undefined) => {
+    const notePath = getNotePath();
+    if (notePath && uri?.scheme === 'file') {
+      treeProvider.activity.record(
+        notePath,
+        uri.fsPath,
+        getUseGitignore(),
+        getRecentLimit(),
+      );
+    }
+  };
 
   context.subscriptions.push(
     vscode.workspace.registerTextDocumentContentProvider(
@@ -117,6 +131,30 @@ export function activate(context: vscode.ExtensionContext) {
     ),
 
     notesTreeView,
+
+    vscode.window.onDidChangeActiveTextEditor((editor) =>
+      recordNote(editor?.document.uri),
+    ),
+    vscode.workspace.onDidRenameFiles(({ files }) => {
+      const notePath = getNotePath();
+      for (const { oldUri, newUri } of files) {
+        if (oldUri.scheme === 'file') {
+          treeProvider.activity.updatePath(
+            notePath,
+            oldUri.fsPath,
+            newUri.scheme === 'file' ? newUri.fsPath : undefined,
+          );
+        }
+      }
+    }),
+    vscode.workspace.onDidDeleteFiles(({ files }) => {
+      const notePath = getNotePath();
+      for (const uri of files) {
+        if (uri.scheme === 'file') {
+          treeProvider.activity.updatePath(notePath, uri.fsPath);
+        }
+      }
+    }),
 
     vscode.commands.registerCommand(Cmd.Setup, async () => {
       await setupNotes();
@@ -198,14 +236,24 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand(
       Cmd.RenameItemInNotesView,
       async (item: { data: { filePath?: string } }) => {
-        await renameItem(item?.data?.filePath ?? '');
+        const filePath = item?.data?.filePath;
+        if (!filePath) return;
+        const notePath = getNotePath();
+        await renameItem(filePath, (newPath) =>
+          treeProvider.activity.updatePath(notePath, filePath, newPath),
+        );
         treeProvider.refresh();
       },
     ),
     vscode.commands.registerCommand(
       Cmd.DeleteItemInNotesView,
       async (item: { data: { filePath?: string } }) => {
-        await deleteItem(item?.data?.filePath ?? '');
+        const filePath = item?.data?.filePath;
+        if (!filePath) return;
+        const notePath = getNotePath();
+        if (await deleteItem(filePath)) {
+          treeProvider.activity.updatePath(notePath, filePath);
+        }
         treeProvider.refresh();
       },
     ),
@@ -224,8 +272,15 @@ export function activate(context: vscode.ExtensionContext) {
       (item: { data: { filePath?: string } }) =>
         viewDiff(item?.data?.filePath ?? ''),
     ),
-    vscode.commands.registerCommand(Cmd.OpenPreviewInNotesView, openPreview),
+    vscode.commands.registerCommand(
+      Cmd.OpenPreviewInNotesView,
+      async (item: { data: NoteTreeItem }) => {
+        const uri = await openPreview(item);
+        recordNote(uri);
+      },
+    ),
   );
+  recordNote(vscode.window.activeTextEditor?.document.uri);
 
   // Watch notes independently of Jujutsu so external edits always update the view.
   let fsWatcher: vscode.FileSystemWatcher | undefined;

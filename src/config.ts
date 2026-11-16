@@ -2,6 +2,7 @@ import * as path from 'node:path';
 import * as vscode from 'vscode';
 import {
   Configurations as Conf,
+  DEFAULT_RECENT_LIMIT,
   EXTENSION_ID,
 } from './contributions/configurations';
 import type { PathSeparatorOption } from './utils/file-utils';
@@ -48,6 +49,16 @@ export function getViewHiddenPatterns(): string[] {
 /** When true, .gitignore patterns in the notes folder are applied to all scans. */
 export function getUseGitignore(): boolean {
   return getConfig().get<boolean>(Conf.ViewUseGitignore) ?? true;
+}
+
+export function getRecentLimit(): number {
+  const limit = getConfig().get<number>(
+    Conf.ViewRecentLimit,
+    DEFAULT_RECENT_LIMIT,
+  );
+  return Number.isSafeInteger(limit) && limit >= 0
+    ? limit
+    : DEFAULT_RECENT_LIMIT;
 }
 
 /** When true, file counters start at 1 ({{N}}→_1, no-token→_1). Default false (start at 2). */

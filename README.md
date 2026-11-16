@@ -13,6 +13,7 @@
 GroveNotes is a Visual Studio Code extension that helps you organize and manage your notes without leaving your editor.
 
 - Tree view for notes management
+- Recently opened notes in the sidebar
 - Support for nested folders and markdown files
 - Note templates for quick creation
 - Tagging system for easy organization
@@ -43,6 +44,10 @@ If you want to use Jujutsu features, install `jj` from:
 Once you have GroveNotes installed, you can open the Notes view from the sidebar.  
 From there, you can create new notes and folders, organize them in a tree structure, and manage them with ease. Right-clicking on items in the tree view will show a context menu with various actions you can perform on your notes and folders.  
 ![Screenshot - VS Code](images/screenshot-1.png)
+
+Expand **Recent** to revisit recently opened notes. The history is saved per notes folder.
+
+Set `grove-notes.view.recentLimit` to change how many notes **Recent** shows. The default is 20. Set it to 0 to hide the section.
 
 Right-click context menu for notes and folders:  
 ![Screenshot - Right-click context menu](images/screenshot-2.png)

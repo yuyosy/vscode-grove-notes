@@ -4,7 +4,7 @@
 
   "command.setup.title": "GroveNotes: Setup Notes Folder",
   "command.newNote.title": "GroveNotes: New Note",
-  "command.listNotes.title": "GroveNotes: List Recent Notes",
+  "command.listNotes.title": "GroveNotes: List Recently Modified Notes",
   "command.listTags.title": "GroveNotes: Browse by Tag",
   "command.refresh.title": "GroveNotes: Refresh View",
   "command.refresh.title.short": "Refresh",
@@ -44,6 +44,7 @@
   "viewsWelcome.notesView.contents": "$(notebook) Notes\n\nNo notes folder configured yet.\nSelect a folder to start managing your Markdown notes.\n\n[$(folder-opened) Select Notes Folder](command:grove-notes.selectNotesFolder)\n\nOr run `Notes: Setup Notes Folder` from the Command Palette (Ctrl+Shift+P).\n\nAlready have a path? $(settings-gear) [Open Settings](command:workbench.action.openSettings?%5B%22grove-notes.notePath%22%5D) to set it directly.\n\nOther settings include templates path, default note title format, ignore patterns, tags, and Jujutsu version control options. Explore the settings to customize your note-taking experience!\n\n$(settings-gear) [Open Extension Settings](command:workbench.action.openSettings?%5B%22grove-notes%22%5D)",
 
   "config.title": "GroveNotes",
+  "config.view.recentLimit.description": "Maximum number of recently opened notes shown in the Recent section. Set to 0 to hide Recent.",
   "config.notePath.description": "Path to the notes folder",
   "config.templatePath.description": "Path to the templates folder. Defaults to <notePath>/.templates if empty.",
   "config.defaultNoteTitle.description": "File name format for new notes. Supports {{YYYY}}, {{MM}}, {{DD}}, {{HH}}, {{mm}}, {{ss}}, {{title}}.",
