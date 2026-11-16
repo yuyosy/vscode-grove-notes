@@ -26,6 +26,7 @@ import {
   getAutoCommitInterval,
   getJjPathSetting,
   getNotePath,
+  getRecentLimit,
   getUseGitignore,
   getUseJujutsu,
 } from './config';
@@ -114,7 +115,12 @@ export function activate(context: vscode.ExtensionContext) {
   const recordNote = (uri: vscode.Uri | undefined) => {
     const notePath = getNotePath();
     if (notePath && uri?.scheme === 'file') {
-      treeProvider.activity.record(notePath, uri.fsPath, getUseGitignore());
+      treeProvider.activity.record(
+        notePath,
+        uri.fsPath,
+        getUseGitignore(),
+        getRecentLimit(),
+      );
     }
   };
 

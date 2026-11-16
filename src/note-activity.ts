@@ -1,10 +1,9 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import type { Memento } from 'vscode';
+import { DEFAULT_RECENT_LIMIT } from './contributions/configurations';
 import { SYSTEM_IGNORE_PATTERNS } from './utils/file-utils';
 import { createGitignoreFilter } from './utils/gitignore-utils';
-
-const RECENT_LIMIT = 20;
 
 interface NoteActivityEntries {
   recent: string[];
@@ -46,7 +45,12 @@ export class NoteActivity {
     private readonly onChange: () => void,
   ) {}
 
-  getRecent(root: string, useGitignore: boolean): string[] {
+  getRecent(
+    root: string,
+    useGitignore: boolean,
+    limit = DEFAULT_RECENT_LIMIT,
+  ): string[] {
+    if (limit === 0) return [];
     const { recent } = this.getEntries(root);
     const isIgnored = useGitignore ? createGitignoreFilter(root) : () => false;
     return recent
@@ -59,10 +63,16 @@ export class NoteActivity {
           !isIgnored(filePath, false) &&
           isFile(filePath)
         );
-      });
+      })
+      .slice(0, limit);
   }
 
-  record(root: string, filePath: string, useGitignore: boolean): void {
+  record(
+    root: string,
+    filePath: string,
+    useGitignore: boolean,
+    limit = DEFAULT_RECENT_LIMIT,
+  ): void {
     const relative = relativePath(root, filePath);
     if (
       !root ||
@@ -76,10 +86,16 @@ export class NoteActivity {
     const entries = this.getEntries(root);
     const key = pathKey(relative);
     if (entries.recent[0] && pathKey(entries.recent[0]) === key) return;
+    // Keep the existing history when the display limit is lowered.
+    const retention = Math.max(
+      DEFAULT_RECENT_LIMIT,
+      limit,
+      entries.recent.length,
+    );
     const recent = [
       relative,
       ...entries.recent.filter((entry) => pathKey(entry) !== key),
-    ].slice(0, RECENT_LIMIT);
+    ].slice(0, retention);
     this.save(root, { ...entries, recent });
   }
 

@@ -443,6 +443,12 @@
           "default": true,
           "markdownDescription": "%config.view.useGitignore.description%"
         },
+        "grove-notes.view.recentLimit": {
+          "type": "integer",
+          "default": 20,
+          "minimum": 0,
+          "description": "%config.view.recentLimit.description%"
+        },
         "grove-notes.counterStartsAtOne": {
           "type": "boolean",
           "default": false,

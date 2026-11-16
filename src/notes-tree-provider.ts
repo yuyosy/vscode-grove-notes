@@ -7,6 +7,7 @@ import {
   getHideIgnoreFilesInTagsView,
   getNotePath,
   getPathSeparatorOption,
+  getRecentLimit,
   getUseGitignore,
   getUseJujutsu,
   getViewHiddenPatterns,
@@ -228,7 +229,11 @@ export class NotesTreeProvider
   }
 
   private _getRoots(notePath: string): NotesTreeItem[] {
-    const recent = this.activity.getRecent(notePath, getUseGitignore());
+    const recent = this.activity.getRecent(
+      notePath,
+      getUseGitignore(),
+      getRecentLimit(),
+    );
     const roots: NotesTreeItem[] = [];
     const separator = getPathSeparatorOption();
     if (recent.length > 0) {

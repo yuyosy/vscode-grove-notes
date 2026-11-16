@@ -44,6 +44,8 @@ GroveNotesをインストールしたら、サイドバーからノートビュ�
 新しいノートやフォルダを作成し、ツリー構造で整理して簡単に管理できます。ツリービューのアイテムを右クリックすると、ノートやフォルダに対して基本的なアクションも利用できます。
 ![Screenshot - VS Code](images/screenshot-1.png)
 
+`grove-notes.view.recentLimit` で **Recent** の最大表示件数を指定できます。既定値は20件で、0にすると非表示になります。
+
 ノートやフォルダの右クリックコンテキストメニュー:  
 ![Screenshot - Right-click context menu](images/screenshot-2.png)
 

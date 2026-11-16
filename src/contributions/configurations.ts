@@ -1,4 +1,5 @@
 export const EXTENSION_ID = 'grove-notes' as const;
+export const DEFAULT_RECENT_LIMIT = 20;
 
 const fq = <T extends string>(config: T) =>
   `${EXTENSION_ID}.${config}` as const;
@@ -11,6 +12,7 @@ export const Configurations = {
   PathSeparator: 'pathSeparator',
   ViewHiddenPatterns: 'view.hiddenPatterns',
   ViewUseGitignore: 'view.useGitignore',
+  ViewRecentLimit: 'view.recentLimit',
   CounterStartsAtOne: 'counterStartsAtOne',
   TagsPredefined: 'tags.predefined',
   TagsEnableInView: 'tags.enableTagsInView',
