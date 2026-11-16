@@ -1,4 +1,5 @@
 export type TreeNodeKind =
+  | 'rootPinned'
   | 'rootRecent'
   | 'rootFile'
   | 'rootTag'

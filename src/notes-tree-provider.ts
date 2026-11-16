@@ -27,6 +27,7 @@ export class NotesTreeItem extends vscode.TreeItem {
     public readonly data: NoteTreeItem,
     collapsibleState: vscode.TreeItemCollapsibleState,
     modifiedFiles?: Set<string>,
+    pinned = false,
   ) {
     super(data.label, collapsibleState);
 
@@ -38,7 +39,7 @@ export class NotesTreeItem extends vscode.TreeItem {
         arguments: [vscode.Uri.file(data.filePath)],
       };
       const isModified = modifiedFiles?.has(data.filePath) ?? false;
-      this.contextValue = isModified ? 'noteFileModified' : 'noteFile';
+      this.contextValue = `noteFile${isModified ? 'Modified' : ''}${pinned ? 'Pinned' : ''}`;
     } else if (data.kind === 'dir') {
       this.contextValue = 'noteDir';
       this.iconPath = new vscode.ThemeIcon('folder');
@@ -48,9 +49,11 @@ export class NotesTreeItem extends vscode.TreeItem {
     } else if (data.kind === 'rootTag') {
       this.iconPath = new vscode.ThemeIcon('tag');
       this.contextValue = 'rootTag';
-    } else if (data.kind === 'rootRecent') {
+    } else if (data.kind === 'rootPinned' || data.kind === 'rootRecent') {
       this.id = data.kind;
-      this.iconPath = new vscode.ThemeIcon('history');
+      this.iconPath = new vscode.ThemeIcon(
+        data.kind === 'rootPinned' ? 'pinned' : 'history',
+      );
     } else if (data.kind === 'tag') {
       this.iconPath = new vscode.ThemeIcon('tag');
       this.contextValue = 'noteTag';
@@ -196,10 +199,14 @@ export class NotesTreeProvider
       return this._getDirChildren(notePath, this._modifiedFilesCache);
     }
 
-    if (kind === 'rootRecent') {
+    if (kind === 'rootPinned' || kind === 'rootRecent') {
       return (
         element.data.files?.map((file) => {
-          const item = this._makeFileItem(file, this._modifiedFilesCache);
+          const item = this._makeFileItem(
+            notePath,
+            file,
+            this._modifiedFilesCache,
+          );
           item.id = JSON.stringify([kind, file.filePath]);
           return item;
         }) ?? []
@@ -220,7 +227,7 @@ export class NotesTreeProvider
 
       if (kind === 'tag' && element.data.files) {
         return element.data.files.map((f) =>
-          this._makeFileItem(f, this._modifiedFilesCache),
+          this._makeFileItem(notePath, f, this._modifiedFilesCache),
         );
       }
     }
@@ -229,15 +236,20 @@ export class NotesTreeProvider
   }
 
   private _getRoots(notePath: string): NotesTreeItem[] {
-    const recent = this.activity.getRecent(
+    const { pinned, recent } = this.activity.getVisibleEntries(
       notePath,
       getUseGitignore(),
       getRecentLimit(),
     );
     const roots: NotesTreeItem[] = [];
     const separator = getPathSeparatorOption();
-    if (recent.length > 0) {
-      const files = recent.map(
+    const addActivityRoot = (
+      kind: 'rootPinned' | 'rootRecent',
+      label: string,
+      paths: string[],
+    ) => {
+      if (paths.length === 0) return;
+      const files = paths.map(
         (filePath): NoteTreeItem => ({
           kind: 'file',
           filePath,
@@ -246,11 +258,15 @@ export class NotesTreeProvider
       );
       roots.push(
         new NotesTreeItem(
-          { kind: 'rootRecent', label: 'Recent', files },
-          vscode.TreeItemCollapsibleState.Collapsed,
+          { kind, label, files },
+          kind === 'rootPinned'
+            ? vscode.TreeItemCollapsibleState.Expanded
+            : vscode.TreeItemCollapsibleState.Collapsed,
         ),
       );
-    }
+    };
+    addActivityRoot('rootPinned', 'Pinned', pinned);
+    addActivityRoot('rootRecent', 'Recent', recent);
     roots.push(
       new NotesTreeItem(
         { kind: 'rootFile', label: 'Files' },
@@ -304,6 +320,7 @@ export class NotesTreeProvider
     for (const f of files) {
       result.push(
         this._makeFileItem(
+          notePath,
           { kind: 'file', label: f.name, filePath: f.fullPath },
           modifiedFiles,
         ),
@@ -314,6 +331,7 @@ export class NotesTreeProvider
   }
 
   private _makeFileItem(
+    notePath: string,
     data: NoteTreeItem,
     modifiedFiles?: Set<string>,
   ): NotesTreeItem {
@@ -321,6 +339,7 @@ export class NotesTreeProvider
       data,
       vscode.TreeItemCollapsibleState.None,
       modifiedFiles,
+      !!data.filePath && this.activity.isPinned(notePath, data.filePath),
     );
   }
 

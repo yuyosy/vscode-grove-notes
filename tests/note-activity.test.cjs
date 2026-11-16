@@ -19,6 +19,10 @@ function setup(t) {
   };
   return {
     createActivity: () => new NoteActivity(state, () => {}),
+    seedRecent: (root, file) => {
+      const key = process.platform === 'win32' ? root.toLowerCase() : root;
+      saved.set(`noteActivity:${key}`, { recent: [path.relative(root, file)] });
+    },
     root: (name) => path.join(dir, name),
     write: (name, content = '') => {
       const file = path.join(dir, name);
@@ -72,12 +76,56 @@ test('history follows renamed folders and deleted notes are removed', (t) => {
   activity.updatePath(root, from, to);
   const renamed = path.join(to, 'note.md');
   const restored = fixture.createActivity();
-  assert.deepEqual(restored.getRecent(root, false), [renamed]);
+  assert.deepEqual(restored.getVisibleEntries(root, false).recent, [renamed]);
   fs.unlinkSync(renamed);
-  assert.deepEqual(restored.getRecent(root, false), []);
+  assert.deepEqual(restored.getVisibleEntries(root, false).recent, []);
   restored.updatePath(root, renamed);
   fs.writeFileSync(renamed, '');
-  assert.deepEqual(restored.getRecent(root, false), []);
+  assert.deepEqual(restored.getVisibleEntries(root, false).recent, []);
+});
+
+test('pins preserve prior history and follow renamed or deleted notes', (t) => {
+  const fixture = setup(t);
+  const root = fixture.root('notes');
+  const note = fixture.write('notes/topic/note.md');
+  fixture.seedRecent(root, note);
+
+  const activity = fixture.createActivity();
+  assert.deepEqual(activity.getVisibleEntries(root, false), {
+    pinned: [],
+    recent: [note],
+  });
+  activity.setPinned(root, note, true);
+  activity.setPinned(root, note, true);
+
+  const from = path.join(root, 'topic');
+  const to = path.join(root, 'renamed');
+  fs.renameSync(from, to);
+  activity.updatePath(root, from, to);
+  const renamed = path.join(to, 'note.md');
+  const restored = fixture.createActivity();
+  assert.deepEqual(restored.getVisibleEntries(root, false), {
+    pinned: [renamed],
+    recent: [renamed],
+  });
+  assert.deepEqual(restored.getVisibleEntries(root, false, 0), {
+    pinned: [renamed],
+    recent: [],
+  });
+  assert.equal(restored.isPinned(root, renamed), true);
+  restored.setPinned(root, renamed, false);
+  assert.deepEqual(restored.getVisibleEntries(root, false), {
+    pinned: [],
+    recent: [renamed],
+  });
+  restored.setPinned(root, renamed, true);
+  fs.unlinkSync(renamed);
+  restored.updatePath(root, renamed);
+  fs.writeFileSync(renamed, '');
+  assert.deepEqual(restored.getVisibleEntries(root, false), {
+    pinned: [],
+    recent: [],
+  });
 });
 
 test('the display limit supports more than 20 notes and can hide history without clearing it', (t) => {
