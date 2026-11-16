@@ -4,7 +4,7 @@
 
   "command.setup.title": "GroveNotes: ノートフォルダーのセットアップ",
   "command.newNote.title": "GroveNotes: 新規ノート作成",
-  "command.listNotes.title": "GroveNotes: 最近のノートを開く",
+  "command.listNotes.title": "GroveNotes: 最近更新したノートを開く",
   "command.listTags.title": "GroveNotes: タグからノートを探す",
   "command.refresh.title": "GroveNotes: 表示を更新",
   "command.refresh.title.short": "Refresh",

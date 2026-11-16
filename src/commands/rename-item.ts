@@ -7,7 +7,10 @@ import { Commands } from '../contributions/commands';
  * Renames a file or directory inside the notes folder.
  * Receives the absolute path of the item to rename.
  */
-export async function renameItem(itemPath: string): Promise<void> {
+export async function renameItem(
+  itemPath: string,
+  onRenamed: (newPath: string) => void,
+): Promise<void> {
   const isDir = fs.existsSync(itemPath) && fs.statSync(itemPath).isDirectory();
   const dir = path.dirname(itemPath);
   const oldName = path.basename(itemPath);
@@ -39,6 +42,7 @@ export async function renameItem(itemPath: string): Promise<void> {
     vscode.window.showErrorMessage(`Rename failed: ${(err as Error).message}`);
     return;
   }
+  onRenamed(newPath);
 
   // If the renamed file was open in the editor, swap it to the new path
   const editor = vscode.window.visibleTextEditors.find(

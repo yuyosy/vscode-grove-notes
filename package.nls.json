@@ -4,7 +4,7 @@
 
   "command.setup.title": "GroveNotes: Setup Notes Folder",
   "command.newNote.title": "GroveNotes: New Note",
-  "command.listNotes.title": "GroveNotes: List Recent Notes",
+  "command.listNotes.title": "GroveNotes: List Recently Modified Notes",
   "command.listTags.title": "GroveNotes: Browse by Tag",
   "command.refresh.title": "GroveNotes: Refresh View",
   "command.refresh.title.short": "Refresh",

@@ -11,6 +11,7 @@ import {
   getUseJujutsu,
   getViewHiddenPatterns,
 } from './config';
+import { NoteActivity } from './note-activity';
 import type { NoteTreeItem } from './types';
 import {
   getRelativeDisplayPath,
@@ -46,6 +47,9 @@ export class NotesTreeItem extends vscode.TreeItem {
     } else if (data.kind === 'rootTag') {
       this.iconPath = new vscode.ThemeIcon('tag');
       this.contextValue = 'rootTag';
+    } else if (data.kind === 'rootRecent') {
+      this.id = data.kind;
+      this.iconPath = new vscode.ThemeIcon('history');
     } else if (data.kind === 'tag') {
       this.iconPath = new vscode.ThemeIcon('tag');
       this.contextValue = 'noteTag';
@@ -68,6 +72,13 @@ export class NotesTreeProvider
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
   private _modifiedFilesCache: Set<string> = new Set();
+  readonly activity: NoteActivity;
+
+  constructor(state: vscode.Memento) {
+    this.activity = new NoteActivity(state, () =>
+      this._onDidChangeTreeData.fire(),
+    );
+  }
 
   refresh(): void {
     // Refresh the modified-files cache once per cycle so getChildren reuses it
@@ -164,24 +175,34 @@ export class NotesTreeProvider
         );
         return;
       }
+      this.activity.updatePath(notePath, sourcePath, destinationPath);
     }
 
     this.refresh();
   }
 
   getChildren(element?: NotesTreeItem): vscode.ProviderResult<NotesTreeItem[]> {
+    const notePath = getNotePath();
     if (!element) {
       // Return empty array when no folder is set — triggers the viewsWelcome content
-      if (!getNotePath()) return [];
-      return this._getRoots();
+      return notePath ? this._getRoots(notePath) : [];
     }
 
     const { kind } = element.data;
 
     if (kind === 'rootFile') {
-      const notePath = getNotePath();
       if (!notePath) return [];
       return this._getDirChildren(notePath, this._modifiedFilesCache);
+    }
+
+    if (kind === 'rootRecent') {
+      return (
+        element.data.files?.map((file) => {
+          const item = this._makeFileItem(file, this._modifiedFilesCache);
+          item.id = JSON.stringify([kind, file.filePath]);
+          return item;
+        }) ?? []
+      );
     }
 
     if (kind === 'dir' && element.data.filePath) {
@@ -206,13 +227,31 @@ export class NotesTreeProvider
     return [];
   }
 
-  private _getRoots(): NotesTreeItem[] {
-    const roots: NotesTreeItem[] = [
+  private _getRoots(notePath: string): NotesTreeItem[] {
+    const recent = this.activity.getRecent(notePath, getUseGitignore());
+    const roots: NotesTreeItem[] = [];
+    const separator = getPathSeparatorOption();
+    if (recent.length > 0) {
+      const files = recent.map(
+        (filePath): NoteTreeItem => ({
+          kind: 'file',
+          filePath,
+          label: getRelativeDisplayPath(notePath, filePath, separator),
+        }),
+      );
+      roots.push(
+        new NotesTreeItem(
+          { kind: 'rootRecent', label: 'Recent', files },
+          vscode.TreeItemCollapsibleState.Collapsed,
+        ),
+      );
+    }
+    roots.push(
       new NotesTreeItem(
         { kind: 'rootFile', label: 'Files' },
         vscode.TreeItemCollapsibleState.Expanded,
       ),
-    ];
+    );
 
     if (getEnableTagsInView()) {
       roots.push(

@@ -2,11 +2,15 @@ import * as vscode from 'vscode';
 import { getPreviewOpenToSide } from '../config';
 import type { NoteTreeItem } from '../types';
 
-export function openPreview(item: { data: NoteTreeItem }): void {
+export async function openPreview(item: {
+  data: NoteTreeItem;
+}): Promise<vscode.Uri | undefined> {
   const fp = item?.data?.filePath;
   if (!fp) return;
   const cmd = getPreviewOpenToSide()
     ? 'markdown.showPreviewToSide'
     : 'markdown.showPreview';
-  vscode.commands.executeCommand(cmd, vscode.Uri.file(fp));
+  const uri = vscode.Uri.file(fp);
+  await vscode.commands.executeCommand(cmd, uri);
+  return uri;
 }
