@@ -51,16 +51,17 @@ test('recent notes are distinct, limited and persisted per notes folder', (t) =>
   activity.record(fixture.root('notes-extra'), other, true);
 
   const restored = fixture.createActivity();
-  assert.deepEqual(restored.getRecent(root, true), [
+  assert.deepEqual(restored.getVisibleEntries(root, true).recent, [
     files[17],
     ...files
       .slice(2)
       .reverse()
       .filter((file) => file !== files[17]),
   ]);
-  assert.deepEqual(restored.getRecent(fixture.root('notes-extra'), true), [
-    other,
-  ]);
+  assert.deepEqual(
+    restored.getVisibleEntries(fixture.root('notes-extra'), true).recent,
+    [other],
+  );
 });
 
 test('history follows renamed folders and deleted notes are removed', (t) => {
@@ -138,13 +139,13 @@ test('the display limit supports more than 20 notes and can hide history without
   for (const file of files.slice(0, 22)) activity.record(root, file, false, 22);
 
   assert.deepEqual(
-    activity.getRecent(root, false, 4),
+    activity.getVisibleEntries(root, false, 4).recent,
     files.slice(18, 22).reverse(),
   );
-  assert.deepEqual(activity.getRecent(root, false, 0), []);
+  assert.deepEqual(activity.getVisibleEntries(root, false, 0).recent, []);
   activity.record(root, files[22], false, 0);
   assert.deepEqual(
-    activity.getRecent(root, false, 22),
+    activity.getVisibleEntries(root, false, 22).recent,
     files.slice(1).reverse(),
   );
 });
