@@ -6,6 +6,7 @@ import { SYSTEM_IGNORE_PATTERNS } from './utils/file-utils';
 import { createGitignoreFilter } from './utils/gitignore-utils';
 
 interface NoteActivityEntries {
+  pinned: string[];
   recent: string[];
 }
 
@@ -45,26 +46,40 @@ export class NoteActivity {
     private readonly onChange: () => void,
   ) {}
 
-  getRecent(
+  getVisibleEntries(
     root: string,
     useGitignore: boolean,
-    limit = DEFAULT_RECENT_LIMIT,
-  ): string[] {
-    if (limit === 0) return [];
-    const { recent } = this.getEntries(root);
+    recentLimit = DEFAULT_RECENT_LIMIT,
+  ): NoteActivityEntries {
+    const { pinned, recent } = this.getEntries(root);
     const isIgnored = useGitignore ? createGitignoreFilter(root) : () => false;
-    return recent
-      .map((entry) => path.resolve(root, entry))
-      .filter((filePath) => {
-        const relative = relativePath(root, filePath);
-        return (
-          relative &&
-          isNotePath(relative) &&
-          !isIgnored(filePath, false) &&
-          isFile(filePath)
-        );
-      })
-      .slice(0, limit);
+    const visiblePaths = (entries: string[]) =>
+      entries
+        .map((entry) => path.resolve(root, entry))
+        .filter((filePath) => {
+          const relative = relativePath(root, filePath);
+          return (
+            relative &&
+            isNotePath(relative) &&
+            !isIgnored(filePath, false) &&
+            isFile(filePath)
+          );
+        });
+    return {
+      pinned: visiblePaths(pinned),
+      recent:
+        recentLimit === 0 ? [] : visiblePaths(recent).slice(0, recentLimit),
+    };
+  }
+
+  isPinned(root: string, filePath: string): boolean {
+    const relative = relativePath(root, filePath);
+    return (
+      !!relative &&
+      this.getEntries(root).pinned.some(
+        (entry) => pathKey(entry) === pathKey(relative),
+      )
+    );
   }
 
   record(
@@ -99,6 +114,20 @@ export class NoteActivity {
     this.save(root, { ...entries, recent });
   }
 
+  setPinned(root: string, filePath: string, pinned: boolean): void {
+    const relative = relativePath(root, filePath);
+    if (!root || !relative || !isNotePath(relative)) return;
+
+    const entries = this.getEntries(root);
+    const key = pathKey(relative);
+    if (entries.pinned.some((entry) => pathKey(entry) === key) === pinned)
+      return;
+    const updatedPins = pinned
+      ? [...entries.pinned, relative]
+      : entries.pinned.filter((entry) => pathKey(entry) !== key);
+    this.save(root, { ...entries, pinned: updatedPins });
+  }
+
   updatePath(root: string, from: string, to?: string): void {
     if (!root) return;
     const source = relativePath(root, from);
@@ -107,19 +136,24 @@ export class NoteActivity {
     const entries = this.getEntries(root);
     let changed = false;
 
-    const updated = new Map<string, string>();
-    for (const entry of entries.recent) {
-      const suffix = relativePath(source, entry);
-      let destination = entry;
-      if (suffix !== undefined || pathKey(source) === pathKey(entry)) {
-        changed = true;
-        if (!target) continue;
-        destination = suffix ? path.join(target, suffix) : target;
+    const update = (paths: string[]): string[] => {
+      const updated = new Map<string, string>();
+      for (const entry of paths) {
+        const suffix = relativePath(source, entry);
+        let destination = entry;
+        if (suffix !== undefined || pathKey(source) === pathKey(entry)) {
+          changed = true;
+          if (!target) continue;
+          destination = suffix ? path.join(target, suffix) : target;
+        }
+        const key = pathKey(destination);
+        if (!updated.has(key)) updated.set(key, destination);
       }
-      const key = pathKey(destination);
-      if (!updated.has(key)) updated.set(key, destination);
-    }
-    if (changed) this.save(root, { ...entries, recent: [...updated.values()] });
+      return [...updated.values()];
+    };
+    const pinned = update(entries.pinned);
+    const recent = update(entries.recent);
+    if (changed) this.save(root, { pinned, recent });
   }
 
   private storageKey(root: string): string {
@@ -127,7 +161,10 @@ export class NoteActivity {
   }
 
   private getEntries(root: string): NoteActivityEntries {
-    return this.state.get(this.storageKey(root), { recent: [] });
+    const entries = this.state.get<Partial<NoteActivityEntries>>(
+      this.storageKey(root),
+    );
+    return { pinned: entries?.pinned ?? [], recent: entries?.recent ?? [] };
   }
 
   private save(root: string, entries: NoteActivityEntries): void {

@@ -143,6 +143,16 @@
         "icon": "$(settings-gear)"
       },
       {
+        "command": "grove-notes.pinNote#notesView",
+        "title": "%command.pinNote#notesView.title%",
+        "icon": "$(pin)"
+      },
+      {
+        "command": "grove-notes.unpinNote#notesView",
+        "title": "%command.unpinNote#notesView.title%",
+        "icon": "$(pinned)"
+      },
+      {
         "command": "grove-notes.editTags#notesView",
         "title": "%command.editTags#notesView.title%",
         "icon": "$(tag)"
@@ -208,6 +218,14 @@
     ],
     "menus": {
       "commandPalette": [
+        {
+          "command": "grove-notes.pinNote#notesView",
+          "when": "false"
+        },
+        {
+          "command": "grove-notes.unpinNote#notesView",
+          "when": "false"
+        },
         {
           "command": "grove-notes.newNote#notesView",
           "when": "false"
@@ -317,6 +335,16 @@
       ],
       "view/item/context": [
         {
+          "command": "grove-notes.pinNote#notesView",
+          "when": "view == notesView && viewItem =~ /^noteFile(Modified)?$/",
+          "group": "1_activity@1"
+        },
+        {
+          "command": "grove-notes.unpinNote#notesView",
+          "when": "view == notesView && viewItem =~ /^noteFile(Modified)?Pinned$/",
+          "group": "1_activity@1"
+        },
+        {
           "command": "grove-notes.newNote#notesView",
           "when": "view == notesView && viewItem == rootFile",
           "group": "navigation@1"
@@ -348,7 +376,7 @@
         },
         {
           "command": "grove-notes.viewDiff#notesView",
-          "when": "view == notesView && viewItem == noteFileModified && grove-notes.jjEnabled",
+          "when": "view == notesView && viewItem =~ /^noteFileModified(Pinned)?$/ && grove-notes.jjEnabled",
           "group": "inline@3"
         },
         {
@@ -383,7 +411,7 @@
         },
         {
           "command": "grove-notes.viewDiff#notesView",
-          "when": "view == notesView && viewItem == noteFileModified && grove-notes.jjEnabled",
+          "when": "view == notesView && viewItem =~ /^noteFileModified(Pinned)?$/ && grove-notes.jjEnabled",
           "group": "notes_4_vcs@1"
         }
       ]

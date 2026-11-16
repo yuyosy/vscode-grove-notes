@@ -30,6 +30,8 @@ export const Commands = {
   OpenSettingsInNotesView: id('openSettings#notesView'),
 
   // in view/item/context menu (#notesView variants with short titles)
+  PinNoteInNotesView: id('pinNote#notesView'),
+  UnpinNoteInNotesView: id('unpinNote#notesView'),
   EditTagsInNotesView: id('editTags#notesView'),
   RenameItemInNotesView: id('renameItem#notesView'),
   DeleteItemInNotesView: id('deleteItem#notesView'),

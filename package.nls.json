@@ -30,6 +30,8 @@
   "command.jjUndo#notesView.title": "jj Undo",
   "command.jjRedo#notesView.title": "jj Redo",
   "command.openSettings#notesView.title": "Open Settings",
+  "command.pinNote#notesView.title": "Pin Note",
+  "command.unpinNote#notesView.title": "Unpin Note",
   "command.editTags#notesView.title": "Edit Tags",
   "command.renameItem#notesView.title": "Rename",
   "command.deleteItem#notesView.title": "Delete",

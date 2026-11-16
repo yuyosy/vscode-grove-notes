@@ -227,6 +227,30 @@ export function activate(context: vscode.ExtensionContext) {
 
     // view/item/context menu (#notesView variants)
     vscode.commands.registerCommand(
+      Cmd.PinNoteInNotesView,
+      (item?: { data: NoteTreeItem }) => {
+        if (item?.data.kind === 'file' && item.data.filePath) {
+          treeProvider.activity.setPinned(
+            getNotePath(),
+            item.data.filePath,
+            true,
+          );
+        }
+      },
+    ),
+    vscode.commands.registerCommand(
+      Cmd.UnpinNoteInNotesView,
+      (item?: { data: NoteTreeItem }) => {
+        if (item?.data.kind === 'file' && item.data.filePath) {
+          treeProvider.activity.setPinned(
+            getNotePath(),
+            item.data.filePath,
+            false,
+          );
+        }
+      },
+    ),
+    vscode.commands.registerCommand(
       Cmd.EditTagsInNotesView,
       async (item: { data: { filePath?: string } }) => {
         await editTags(item?.data?.filePath ?? '');
